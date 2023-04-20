@@ -1,0 +1,16 @@
+{
+    "name": "jet/json-diff",
+    "type": "library",
+    "license": "GNUv3",
+    "autoload": {
+        "psr-4": {
+            "Jet\\JsonDiff\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Jet Lim and Ruben Funai"
+        }
+    ],
+    "require": {}
+}
