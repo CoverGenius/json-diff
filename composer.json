@@ -12,5 +12,7 @@
             "name": "Jet Lim and Ruben Funai"
         }
     ],
-    "require": {}
+    "require": {
+        "php": "^7.3"
+    }
 }
