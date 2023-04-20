@@ -7,6 +7,11 @@
             "Jet\\JsonDiff\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Jet Lim and Ruben Funai"
@@ -14,5 +19,8 @@
     ],
     "require": {
         "php": "^7.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6"
     }
 }
