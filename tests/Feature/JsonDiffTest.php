@@ -142,4 +142,52 @@ class JsonDiffTest extends TestCase
 
         $jsonDiff = new JsonDiff($original, $new);
     }
+
+    public function testComplexRecursion2JsonDiff()
+    {
+        $original = [
+            [
+                'name' => 'Jet Lim',
+                'age' => 23,
+                'birth_date' => '16/07/1980',
+                'passport' => [
+                    'id' => 'B12567890',
+                    'nationality' => 'Malaysian'
+                ],
+                'sports' => [
+                    [
+                        'name' => 'badminton'
+                    ],
+                    [
+                        'name' => 'soccer'
+                    ]
+                ],
+            ]
+        ];
+
+        $new = [
+            [
+                'name' => 'Jet Lim',
+                'age' => 23,
+                'birth_date' => '16/07/1980',
+                'passport' => [
+                    'id' => 'B12567890',
+                    'nationality' => 'Malaysian'
+                ],
+                'sports' => [
+                    [
+                        'name' => 'badminton'
+                    ],
+                    [
+                        'name' => 'rugby'
+                    ],
+                    [
+                        'name' => 'soccer'
+                    ]
+                ],
+            ]
+        ];
+
+        $jsonDiff = new JsonDiff($original, $new);
+    }
 }

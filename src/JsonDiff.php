@@ -34,6 +34,11 @@ class JsonDiff
      */
     private $valuesChanged;
 
+    /**
+     * @var JsonHash
+     */
+    private $jsonHash;
+
     public function __construct(array $original, array $new)
     {
         $this->keysAdded = collect();
@@ -42,6 +47,7 @@ class JsonDiff
         $this->valuesRemoved = collect();
         $this->valuesChanged = collect();
 
+        $new = $this->rearrangeArray($original, $new);
         $this->process($original, $new);
         dd($this);
     }
@@ -74,9 +80,64 @@ class JsonDiff
 
             if ($original[$key] !== $new[$key]) {
                 $this->valuesChanged->push(new ValueChange("{$path}{$key}", $original[$key], $new[$key]));
-                dump($this->valuesChanged);
             }
         });
+    }
+
+    /**
+     * @param array $original
+     * @param array $new
+     * @return array
+     */
+    protected function rearrangeArray(array $original, array $new): array
+    {
+        if ($this->jsonHash === null) {
+            $this->jsonHash = new JsonHash();
+        }
+
+        // Rearrange nested arrays
+        foreach ($original as $i => $item) {
+            if (is_array($item) && is_array($new[$i])) {
+                $new[$i] = $this->rearrangeArray($item, $new[$i]);
+            }
+        }
+
+        $origIdx = [];
+        foreach ($original as $i => $item) {
+            $hash = $this->jsonHash->xorHash($item);
+            $origIdx[$hash][] = $i;
+        }
+
+        $newIdx = [];
+        foreach ($new as $i => $item) {
+            $hash = $this->jsonHash->xorHash($item);
+            $newIdx[$i] = $hash;
+        }
+
+        $newRearranged = [];
+        $changedItems = [];
+        foreach ($newIdx as $i => $hash) {
+            if (!empty($origIdx[$hash])) {
+                $j = array_shift($origIdx[$hash]);
+
+                $newRearranged[$j] = $new[$i];
+            } else {
+                $changedItems[]= $new[$i];
+            }
+
+        }
+
+        $idx = 0;
+        foreach ($changedItems as $item) {
+            while (array_key_exists($idx, $newRearranged)) {
+                $idx++;
+            }
+            $newRearranged[$idx] = $item;
+        }
+
+        ksort($newRearranged);
+
+        return $newRearranged;
     }
 }
 
