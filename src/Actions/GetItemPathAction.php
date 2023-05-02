@@ -6,7 +6,12 @@ namespace Jet\JsonDiff\Actions;
 
 class GetItemPathAction
 {
-    public function execute(string $currentPath, string $key): string
+    /**
+     * @param string $currentPath
+     * @param string|int $key
+     * @return string
+     */
+    public function execute(string $currentPath, $key): string
     {
         return "{$currentPath}{$key}";
     }

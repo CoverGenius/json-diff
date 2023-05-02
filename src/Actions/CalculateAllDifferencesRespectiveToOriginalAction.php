@@ -20,14 +20,18 @@ class CalculateAllDifferencesRespectiveToOriginalAction
         $this->getTraversingPathAction = $getTraversingPathAction;
     }
 
+    /**
+     * Calculate the differences between the original keys and all of the new keys
+     * group by the original key.
+     */
     public function execute(array $original, array $new, string $path): Collection
     {
         $diffMappings = collect();
 
-        // Calculate the differences between the original keys and all of the new keys
         foreach ($original as $originalIndex => $originalValue) {
+            $diffs = collect();
             foreach ($new as $newIndex => $newValue) {
-                $diffMappings->push(
+                $diffs->push(
                     new DiffMapping(
                         $originalIndex,
                         $newIndex,
@@ -39,6 +43,7 @@ class CalculateAllDifferencesRespectiveToOriginalAction
                     )
                 );
             }
+            $diffMappings->offsetSet($originalIndex, $diffs);
         }
 
         return $diffMappings;
