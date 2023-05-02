@@ -196,18 +196,28 @@ class JsonDiffTest extends TestCase
     public function testMinimalChangesJsonDiff(): void
     {
         $original = [
-            [
-                'name' => 'Soccer',
-            ],
+            'sports' => [
+                [
+                    'name' => 'Soccer',
+                ],
+                [
+                    'name' => 'Tennis',
+                ],
+            ]
         ];
 
         $new = [
-            [
-                'name' => 'Swimming',
-            ],
-            [
-                'name' => 'Soccer',
-            ],
+            'sports' => [
+                [
+                    'name' => 'Swimming',
+                ],
+                [
+                    'name' => 'Soccer',
+                ],
+                [
+                    'name' => 'Tennis',
+                ],
+            ]
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
