@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace Jet\JsonDiff;
 
 use Exception;
+use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
+use Jet\JsonDiff\Actions\CalculateAllDifferencesRespectiveToOriginalAction;
+use Jet\JsonDiff\Actions\CalculateMinimalDiffOfListArrayAction;
+use Jet\JsonDiff\Actions\GetItemPathAction;
+use Jet\JsonDiff\Actions\GetTraversingPathAction;
 
 class JsonDiff
 {
@@ -39,7 +44,27 @@ class JsonDiff
      */
     private $jsonHash;
 
-    public function __construct(array $original, array $new)
+    /**
+     * @var Container
+     */
+    private $serviceContainer;
+
+    /**
+     * @var GetTraversingPathAction
+     */
+    private $getTraversingPathAction;
+
+    /**
+     * @var GetItemPathAction
+     */
+    private $getItemPathAction;
+
+    /**
+     * @var CalculateMinimalDiffOfListArrayAction
+     */
+    private $calculateMinimalDiffOfListArrayAction;
+
+    public function __construct(array $original, array $new, string $startingPath = '')
     {
         $this->keysAdded = collect();
         $this->keysRemoved = collect();
@@ -47,9 +72,16 @@ class JsonDiff
         $this->valuesRemoved = collect();
         $this->valuesChanged = collect();
 
-        $new = $this->rearrangeArray($original, $new);
-        $this->process($original, $new);
-        dd($this);
+        $this->serviceContainer = Container::getInstance();
+
+        $this->getTraversingPathAction = $this->serviceContainer
+            ->make(GetTraversingPathAction::class);
+        $this->getItemPathAction = $this->serviceContainer
+            ->make(GetItemPathAction::class);
+        $this->calculateMinimalDiffOfListArrayAction = $this->serviceContainer
+            ->make(CalculateMinimalDiffOfListArrayAction::class);
+
+        $this->process($original, $new, $startingPath);
     }
 
     protected function process(array $original, array $new, string $path = ''): void
@@ -59,36 +91,76 @@ class JsonDiff
 
         $keysAdded = array_diff($newKeys, $originalKeys);
         collect($keysAdded)->each(function ($key) use ($new, $path) {
-             $this->keysAdded->push(new KeyAdded("{$path}{$key}", $key));
-             $this->valuesAdded->push(new ValueAdded("{$path}{$key}", $new[$key]));
+             $this->keysAdded->push(new KeyAdded($this->getItemPathAction->execute($path, $key), $key));
+             $this->valuesAdded->push(new ValueAdded($this->getItemPathAction->execute($path, $key), $new[$key]));
         });
 
         $keysRemoved = array_diff($originalKeys, $newKeys);
         collect($keysRemoved)->each(function ($key) use ($original, $path) {
-            $this->keysRemoved->push(new KeyRemoved("{$path}{$key}", $key));
-            $this->valuesRemoved->push(new ValueRemoved("{$path}{$key}", $original[$key]));
+            $this->keysRemoved->push(new KeyRemoved($this->getItemPathAction->execute($path, $key), $key));
+            $this->valuesRemoved->push(new ValueRemoved($this->getItemPathAction->execute($path, $key), $original[$key]));
         });
 
         $mutualKeys = array_intersect($originalKeys, $newKeys);
         // Check if value has changed
         collect($mutualKeys)->each(function ($key) use ($new, $original, $path) {
             // @todo if the value is an object, decide what to do
-            if (is_array($original[$key]) && is_array($new[$key])) {
-                $this->process($original[$key], $new[$key], "{$path}{$key}.");
+            $currentOriginal = $original[$key];
+            $currentNew = $new[$key];
+
+            if (is_array($currentOriginal) && is_array($currentNew)) {
+                if (array_is_list($currentOriginal) && array_is_list($currentNew)) {
+                    $this->mergeChanges(
+                        $this
+                            ->calculateMinimalDiffOfListArrayAction
+                            ->execute(
+                                $currentOriginal,
+                                $currentNew,
+                                $this->getTraversingPathAction->execute($path, $key)
+                            )
+                    );
+                    return;
+                }
+
+                $this->process($currentOriginal, $currentNew, $this->getTraversingPathAction->execute($path, $key));
                 return;
             }
 
-            if ($original[$key] !== $new[$key]) {
-                $this->valuesChanged->push(new ValueChange("{$path}{$key}", $original[$key], $new[$key]));
+            if ($currentOriginal !== $currentNew) {
+                $this->valuesChanged->push(new ValueChange($this->getItemPathAction->execute($path, $key), $currentOriginal, $currentNew));
             }
         });
     }
 
-    /**
-     * @param array $original
-     * @param array $new
-     * @return array
-     */
+    public function getNumberOfChanges(): int
+    {
+        return
+            $this->keysAdded->count() +
+            $this->keysRemoved->count() +
+            $this->valuesAdded->count() +
+            $this->valuesRemoved->count() +
+            $this->valuesChanged->count();
+    }
+
+    protected function hasNoChanges(): bool
+    {
+        return
+            $this->keysAdded->isEmpty() &&
+            $this->keysRemoved->isEmpty() &&
+            $this->valuesAdded->isEmpty() &&
+            $this->valuesRemoved->isEmpty() &&
+            $this->valuesChanged->isEmpty();
+    }
+
+    protected function mergeChanges(JsonDiff $jsonDiff): void
+    {
+        $this->keysAdded = $this->keysAdded->merge($jsonDiff->getKeysAdded());
+        $this->keysRemoved = $this->keysRemoved->merge($jsonDiff->getKeysRemoved());
+        $this->valuesAdded = $this->valuesAdded->merge($jsonDiff->getValuesAdded());
+        $this->valuesRemoved = $this->valuesRemoved->merge($jsonDiff->getValuesRemoved());
+        $this->valuesChanged = $this->valuesChanged->merge($jsonDiff->getValuesChanged());
+    }
+
     protected function rearrangeArray(array $original, array $new): array
     {
         if ($this->jsonHash === null) {
@@ -138,6 +210,31 @@ class JsonDiff
         ksort($newRearranged);
 
         return $newRearranged;
+    }
+
+    public function getKeysAdded(): Collection
+    {
+        return $this->keysAdded;
+    }
+
+    public function getKeysRemoved(): Collection
+    {
+        return $this->keysRemoved;
+    }
+
+    public function getValuesAdded(): Collection
+    {
+        return $this->valuesAdded;
+    }
+
+    public function getValuesRemoved(): Collection
+    {
+        return $this->valuesRemoved;
+    }
+
+    public function getValuesChanged(): Collection
+    {
+        return $this->valuesChanged;
     }
 }
 

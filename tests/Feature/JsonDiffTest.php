@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jet\Tests;
 
+use Illuminate\Container\Container;
+use Jet\JsonDiff\Actions\CalculateAllDifferencesRespectiveToOriginalAction;
 use Jet\JsonDiff\JsonDiff;
 use PHPUnit\Framework\TestCase;
 
@@ -186,6 +188,26 @@ class JsonDiffTest extends TestCase
                     ]
                 ],
             ]
+        ];
+
+        $jsonDiff = new JsonDiff($original, $new);
+    }
+
+    public function testMinimalChangesJsonDiff(): void
+    {
+        $original = [
+            [
+                'name' => 'Soccer',
+            ],
+        ];
+
+        $new = [
+            [
+                'name' => 'Swimming',
+            ],
+            [
+                'name' => 'Soccer',
+            ],
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
