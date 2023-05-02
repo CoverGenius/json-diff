@@ -15,7 +15,16 @@ class SortKeyDifferencesByNumberOfChangesAction
             ->map(function (Collection $diffMappings) {
                 return $diffMappings
                     ->sort(function (DiffMapping $diffMappingA, DiffMapping $diffMappingB): int {
-                        return $diffMappingA->getDiff()->getNumberOfChanges() - $diffMappingB->getDiff()->getNumberOfChanges();
+                        $sortResult = $diffMappingA->getDiff()->getNumberOfChanges() - $diffMappingB->getDiff()->getNumberOfChanges();
+
+                        // If the number of changes are the same, prioritise value changes over key additions
+                        if ($sortResult === 0) {
+                            $sortResult = $diffMappingA->getDiff()->getValuesChanged()->count() - $diffMappingB->getDiff()->getValuesChanged()->count();
+                        }
+
+                        // @todo think about scenarios where keys are removed.
+
+                        return $sortResult;
                     })
                     ->values();
             });

@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Jet\JsonDiff;
 
-use Exception;
 use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
-use Jet\JsonDiff\Actions\CalculateAllDifferencesRespectiveToOriginalAction;
 use Jet\JsonDiff\Actions\CalculateMinimalDiffOfListArrayAction;
 use Jet\JsonDiff\Actions\GetItemPathAction;
 use Jet\JsonDiff\Actions\GetTraversingPathAction;
@@ -38,11 +36,6 @@ class JsonDiff
      * @var Collection
      */
     private $valuesChanged;
-
-    /**
-     * @var JsonHash
-     */
-    private $jsonHash;
 
     /**
      * @var Container
@@ -81,7 +74,16 @@ class JsonDiff
         $this->calculateMinimalDiffOfListArrayAction = $this->serviceContainer
             ->make(CalculateMinimalDiffOfListArrayAction::class);
 
-        $this->process($original, $new, $startingPath);
+        if (array_is_list($original) && array_is_list($new)) {
+            $this
+                ->mergeChanges(
+                    $this
+                        ->calculateMinimalDiffOfListArrayAction
+                        ->execute($original, $new, $startingPath)
+                );
+        } else {
+            $this->process($original, $new, $startingPath);
+        }
     }
 
     protected function process(array $original, array $new, string $path = ''): void
@@ -91,14 +93,12 @@ class JsonDiff
 
         $keysAdded = array_diff($newKeys, $originalKeys);
         collect($keysAdded)->each(function ($key) use ($new, $path) {
-             $this->keysAdded->push(new KeyAdded($this->getItemPathAction->execute($path, $key), $key));
-             $this->valuesAdded->push(new ValueAdded($this->getItemPathAction->execute($path, $key), $new[$key]));
+            $this->addAddedKey($this->getItemPathAction->execute($path, $key), $key, $new[$key]);
         });
 
         $keysRemoved = array_diff($originalKeys, $newKeys);
         collect($keysRemoved)->each(function ($key) use ($original, $path) {
-            $this->keysRemoved->push(new KeyRemoved($this->getItemPathAction->execute($path, $key), $key));
-            $this->valuesRemoved->push(new ValueRemoved($this->getItemPathAction->execute($path, $key), $original[$key]));
+            $this->addRemovedKey($this->getItemPathAction->execute($path, $key), $key, $original[$key]);
         });
 
         $mutualKeys = array_intersect($originalKeys, $newKeys);
@@ -137,22 +137,10 @@ class JsonDiff
         return
             $this->keysAdded->count() +
             $this->keysRemoved->count() +
-            $this->valuesAdded->count() +
-            $this->valuesRemoved->count() +
             $this->valuesChanged->count();
     }
 
-    protected function hasNoChanges(): bool
-    {
-        return
-            $this->keysAdded->isEmpty() &&
-            $this->keysRemoved->isEmpty() &&
-            $this->valuesAdded->isEmpty() &&
-            $this->valuesRemoved->isEmpty() &&
-            $this->valuesChanged->isEmpty();
-    }
-
-    protected function mergeChanges(JsonDiff $jsonDiff): void
+    public function mergeChanges(JsonDiff $jsonDiff): void
     {
         $this->keysAdded = $this->keysAdded->merge($jsonDiff->getKeysAdded());
         $this->keysRemoved = $this->keysRemoved->merge($jsonDiff->getKeysRemoved());
@@ -161,55 +149,32 @@ class JsonDiff
         $this->valuesChanged = $this->valuesChanged->merge($jsonDiff->getValuesChanged());
     }
 
-    protected function rearrangeArray(array $original, array $new): array
+    /**
+     * @param string $path
+     * @param string|int $keyName
+     * @param $value
+     * @return $this
+     */
+    public function addAddedKey(string $path, $keyName, $value): JsonDiff
     {
-        if ($this->jsonHash === null) {
-            $this->jsonHash = new JsonHash();
-        }
+        $this->keysAdded->push(new KeyAdded($path, $keyName));
+        $this->valuesAdded->push(new ValueAdded($path, $value));
 
-        // Rearrange nested arrays
-        foreach ($original as $i => $item) {
-            if (is_array($item) && is_array($new[$i])) {
-                $new[$i] = $this->rearrangeArray($item, $new[$i]);
-            }
-        }
+        return $this;
+    }
 
-        $origIdx = [];
-        foreach ($original as $i => $item) {
-            $hash = $this->jsonHash->xorHash($item);
-            $origIdx[$hash][] = $i;
-        }
+    /**
+     * @param string $path
+     * @param string|int $name
+     * @param $value
+     * @return $this
+     */
+    public function addRemovedKey(string $path, $name, $value): JsonDiff
+    {
+        $this->keysRemoved->push(new KeyRemoved($path, $name));
+        $this->valuesRemoved->push(new ValueRemoved($path, $value));
 
-        $newIdx = [];
-        foreach ($new as $i => $item) {
-            $hash = $this->jsonHash->xorHash($item);
-            $newIdx[$i] = $hash;
-        }
-
-        $newRearranged = [];
-        $changedItems = [];
-        foreach ($newIdx as $i => $hash) {
-            if (!empty($origIdx[$hash])) {
-                $j = array_shift($origIdx[$hash]);
-
-                $newRearranged[$j] = $new[$i];
-            } else {
-                $changedItems[]= $new[$i];
-            }
-
-        }
-
-        $idx = 0;
-        foreach ($changedItems as $item) {
-            while (array_key_exists($idx, $newRearranged)) {
-                $idx++;
-            }
-            $newRearranged[$idx] = $item;
-        }
-
-        ksort($newRearranged);
-
-        return $newRearranged;
+        return $this;
     }
 
     public function getKeysAdded(): Collection

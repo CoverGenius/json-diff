@@ -143,6 +143,8 @@ class JsonDiffTest extends TestCase
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
+
+        dd($jsonDiff);
     }
 
     public function testComplexRecursion2JsonDiff()
@@ -191,9 +193,11 @@ class JsonDiffTest extends TestCase
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
+
+        dd($jsonDiff);
     }
 
-    public function testMinimalChangesJsonDiff(): void
+    public function testMinimalChangesJsonDiffAddition(): void
     {
         $original = [
             'sports' => [
@@ -213,6 +217,9 @@ class JsonDiffTest extends TestCase
                 ],
                 [
                     'name' => 'Soccer',
+                    'sub-sports' => [
+                        'football'
+                    ],
                 ],
                 [
                     'name' => 'Tennis',
@@ -221,5 +228,85 @@ class JsonDiffTest extends TestCase
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
+
+        dd($jsonDiff);
+    }
+
+    public function testMinimalChangesJsonDiffRemoval(): void
+    {
+        $original = [
+            'sports' => [
+                [
+                    'name' => 'Soccer',
+                ],
+                [
+                    'name' => 'Tennis',
+                ],
+            ]
+        ];
+
+        $new = [
+            'sports' => [
+                [
+                    'name' => 'Swimming',
+                ],
+            ]
+        ];
+
+        $jsonDiff = new JsonDiff($original, $new);
+
+        dd($jsonDiff);
+    }
+
+    public function testComplexMinimalChangesJsonDiff()
+    {
+        $original = [
+            'name' => 'Jet Lim',
+            'age' => 23,
+            'birth_date' => '16/07/1980',
+            'passport' => [
+                'id' => 'B12567890',
+                'nationality' => 'Malaysian'
+            ],
+            'sports' => [
+                [
+                    'name' => 'badminton'
+                ],
+                [
+                    'name' => 'soccer'
+                ]
+            ],
+        ];
+
+        $new = [
+            'name' => 'Jet Lim',
+            'age' => 23,
+            'birth_date' => '16/07/1980',
+            'passport' => [
+                'id' => 'B12567890',
+                'nationality' => 'Malaysian'
+            ],
+            'sports' => [
+                [
+                    'name' => 'basketball'
+                ],
+                [
+                    'name' => 'swimming'
+                ],
+                [
+                    'name' => 'cycling'
+                ],
+                [
+                    'name' => 'badminton'
+                ],
+                [
+                    'name' => 'soccer'
+                ]
+            ],
+        ];
+
+        $jsonDiff = new JsonDiff($original, $new);
+
+        dd($jsonDiff);
     }
 }

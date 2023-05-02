@@ -21,7 +21,10 @@ class SelectMinimalOriginalDiffsAction
                     })
                 ];
 
-                $keysProcessedInNewArray[] = $returnMapping["{$key}"]->getNewIndex();
+                // No mapping to a new key was found
+                if ($returnMapping["{$key}"] !== null) {
+                    $keysProcessedInNewArray[] = $returnMapping["{$key}"]->getNewIndex();
+                }
 
                 return $returnMapping;
             });
