@@ -6,9 +6,9 @@ namespace Jet\Tests\Factories;
 
 use Illuminate\Support\Arr;
 
-class ArrayFactory
+class AssociativeArrayFactory
 {
-    public static function new(): ArrayFactory
+    public static function new(): AssociativeArrayFactory
     {
         return new self();
     }
