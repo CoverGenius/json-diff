@@ -23,6 +23,8 @@ class CalculateAllDifferencesRespectiveToOriginalAction
     /**
      * Calculate the differences between the original keys and all of the new keys
      * group by the original key.
+     *
+     * @return Collection<DiffMapping>
      */
     public function execute(array $original, array $new, string $path): Collection
     {
