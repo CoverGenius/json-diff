@@ -19,11 +19,8 @@ class GetUnmappedNewIndexesAction
         return collect(array_keys($new))
             ->diff(
                 $diffMappings
-                    ->map(function (?DiffMapping $diffMapping) {
-                        return optional($diffMapping)->getNewIndex();
-                    })
-                    ->filter(function (?int $index) {
-                        return $index !== null;
+                    ->map(function (DiffMapping $diffMapping) {
+                        return $diffMapping->getNewIndex();
                     })
             )
             ->values();

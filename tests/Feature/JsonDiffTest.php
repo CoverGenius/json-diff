@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Jet\Tests;
+namespace Jet\Tests\Feature;
 
-use Illuminate\Container\Container;
-use Jet\JsonDiff\Actions\CalculateAllDifferencesRespectiveToOriginalAction;
 use Jet\JsonDiff\JsonDiff;
 use PHPUnit\Framework\TestCase;
 
@@ -302,6 +300,51 @@ class JsonDiffTest extends TestCase
                 [
                     'name' => 'soccer'
                 ]
+            ],
+        ];
+
+        $jsonDiff = new JsonDiff($original, $new);
+
+        dd($jsonDiff);
+    }
+
+    public function testMinimalChangesJsonDiffRemovalOfMultipleElements(): void
+    {
+        $original = [
+            [
+                'flight_reference' => 'AP10622',
+                'booking_reference' => '345-AST-INS',
+                'airline' => 'Alpaca Airline',
+                'flight_date' => '12/12/2024',
+                'destination' => 'Fiji',
+                'flight_time' => '5h30m'
+            ],
+            [
+                'flight_reference' => 'MH10783',
+                'booking_reference' => '123-MHS-INS',
+                'airline' => 'Koala Airline',
+                'flight_date' => '12/12/2024',
+                'destination' => 'Japan',
+                'flight_time' => '7h30m'
+            ],
+            [
+                'flight_reference' => 'JT12222',
+                'booking_reference' => '222-JTS-INS',
+                'airline' => 'Jet Airline',
+                'flight_date' => '12/12/2024',
+                'destination' => 'France',
+                'flight_time' => '10h45m'
+            ]
+        ];
+
+        $new = [
+            [
+                'flight_reference' => 'MH10783',
+                'booking_reference' => '123-MHS-INS',
+                'airline' => 'Koala Airline',
+                'flight_date' => '12/12/2024',
+                'destination' => 'Japan',
+                'flight_time' => '7h30m'
             ],
         ];
 

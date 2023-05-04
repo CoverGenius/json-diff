@@ -9,15 +9,20 @@ use Jet\JsonDiff\DiffMapping;
 
 class GetUnmappedOriginalIndexesAction
 {
-    public function execute(Collection $diffMappings): Collection
+    /**
+     * @param Collection<DiffMapping> $diffMappings
+     * @param array $original
+     * @return Collection<int>
+     */
+    public function execute(Collection $diffMappings, array $original): Collection
     {
-        return $diffMappings
-            ->filter(function (?DiffMapping $diffMapping) {
-                return $diffMapping === null;
-            })
-            ->map(function (?DiffMapping $diffMapping, int $originalIndex) {
-                return $originalIndex;
-            })
+        return collect(array_keys($original))
+            ->diff(
+                $diffMappings
+                    ->map(function (DiffMapping $diffMapping) {
+                        return $diffMapping->getOriginalIndex();
+                    })
+            )
             ->values();
     }
 }
