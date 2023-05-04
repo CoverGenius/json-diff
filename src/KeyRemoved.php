@@ -20,4 +20,14 @@ class KeyRemoved
         $this->path = $path;
         $this->name = $name;
     }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function getKey()
+    {
+        return $this->name;
+    }
 }

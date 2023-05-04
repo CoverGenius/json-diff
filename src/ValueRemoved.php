@@ -17,4 +17,14 @@ class ValueRemoved
         $this->path = $path;
         $this->value = $value;
     }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
 }
