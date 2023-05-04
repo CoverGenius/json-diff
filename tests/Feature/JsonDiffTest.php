@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Jet\Tests\Feature;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Js;
 use Jet\JsonDiff\JsonDiff;
 use Jet\JsonDiff\KeyAdded;
 use Jet\JsonDiff\KeyRemoved;
 use Jet\JsonDiff\ValueAdded;
 use Jet\JsonDiff\ValueChange;
 use Jet\JsonDiff\ValueRemoved;
+use Jet\Tests\Factories\ListArrayFactory;
 use PHPUnit\Framework\TestCase;
 
 class JsonDiffTest extends TestCase
@@ -142,6 +145,7 @@ class JsonDiffTest extends TestCase
         $this->assertEquals(2, $jsonDiff->getKeysAdded()->count());
 
         $keysAdded = $jsonDiff->getKeysAdded();
+        dd($keysAdded, $jsonDiff);
         $valuesAdded = $jsonDiff->getValuesAdded();
 
         // Check that the new keys are added
@@ -243,7 +247,7 @@ class JsonDiffTest extends TestCase
         ];
 
         $removedItems = [
-            0 => [
+            [
                 'flight_reference' => 'AP10622',
                 'booking_reference' => '345-AST-INS',
                 'airline' => 'Alpaca Airline',
@@ -251,7 +255,7 @@ class JsonDiffTest extends TestCase
                 'destination' => 'Fiji',
                 'flight_time' => '5h30m'
             ],
-            2 => [
+            [
                 'flight_reference' => 'JT12222',
                 'booking_reference' => '222-JTS-INS',
                 'airline' => 'Jet Airline',
@@ -270,7 +274,6 @@ class JsonDiffTest extends TestCase
 
         // Check that the correct values are removed
         $valuesRemoved->each(function (ValueRemoved $valueRemoved) use ($removedItems) {
-            var_dump($valueRemoved->getValue());
             $this->assertContains($valueRemoved->getValue(), $removedItems);
         });
 
@@ -304,163 +307,221 @@ class JsonDiffTest extends TestCase
                 ],
             ],
         ];
+
+        $new = [
+            'id' => '3fe21e46fd78',
+            'company' => 'Beta Airline',
+            'points' => 50000,
+            'duration' => 862,
+            'segment' => [
+                0 => [
+                    'duration' => 635,
+                    'departureTime' => '2023-05-04 00:53:35',
+                    'arrivalTime' => '2023-05-04 11:28:53',
+                    'origin' => 'Sydney',
+                    'destination' => 'Japan',
+                    'connectionDuration' => 125,
+                ],
+                1 => [
+                    'duration' => 180,
+                    'departureTime' => '2023-05-04 13:33:53',
+                    'arrivalTime' => '2023-05-04 16:33:53',
+                    'origin' => 'Japan',
+                    'destination' => 'Korea',
+                ],
+            ],
+        ];
+
+        $modifiedItemsKey = [
+            'company',
+            'points',
+            'segment.0.destination',
+            'segment.1.origin'
+        ];
+
+        $jsonDiff = new JsonDiff($original, $new);
+
+        $valuesChanged = $jsonDiff->getValuesChanged();
+
+        $valuesChanged->each(function (ValueChange $valueChange) use ($new, $modifiedItemsKey) {
+            $this->assertContains($valueChange->getPath(), $modifiedItemsKey);
+            $this->assertEquals(Arr::get($new, $valueChange->getPath()), $valueChange->getNewValue());
+        });
+
+        $this->assertEmpty($jsonDiff->getKeysAdded());
+        $this->assertEmpty($jsonDiff->getKeysRemoved());
+        $this->assertEmpty($jsonDiff->getValuesAdded());
+        $this->assertEmpty($jsonDiff->getValuesRemoved());
     }
 
-    public function testMinimalChangesJsonDiffAddition(): void
+    public function test_add_new_nested_element_between_jsons()
     {
         $original = [
-            'sports' => [
-                [
-                    'name' => 'Soccer',
+            'id' => '3fe21e46fd78',
+            'company' => 'Alpha Airline',
+            'points' => 20000,
+            'duration' => 862,
+            'segment' => [
+                0 => [
+                    'duration' => 635,
+                    'departureTime' => '2023-05-04 00:53:35',
+                    'arrivalTime' => '2023-05-04 11:28:53',
+                    'origin' => 'Sydney',
+                    'destination' => 'Taiwan',
+                    'connectionDuration' => 125,
                 ],
-                [
-                    'name' => 'Tennis',
+                1 => [
+                    'duration' => 180,
+                    'departureTime' => '2023-05-04 13:33:53',
+                    'arrivalTime' => '2023-05-04 16:33:53',
+                    'origin' => 'Taiwan',
+                    'destination' => 'Korea',
                 ],
-            ]
+            ],
         ];
 
         $new = [
-            'sports' => [
-                [
-                    'name' => 'Swimming',
+            'id' => '3fe21e46fd78',
+            'company' => 'Alpha Airline',
+            'points' => 20000,
+            'duration' => 862,
+            'segment' => [
+                0 => [
+                    'booking_reference' => 'AH15243',
+                    'boarding_information' => [
+                        'terminal' => 2,
+                        'gate' => '15'
+                    ],
+                    'duration' => 635,
+                    'departureTime' => '2023-05-04 00:53:35',
+                    'arrivalTime' => '2023-05-04 11:28:53',
+                    'origin' => 'Sydney',
+                    'destination' => 'Taiwan',
+                    'connectionDuration' => 125,
                 ],
-                [
-                    'name' => 'Soccer',
-                    'sub-sports' => [
-                        'football'
+                1 => [
+                    'booking_reference' => 'AH35728',
+                    'boarding_information' => [
+                        'terminal' => 1,
+                        'gate' => '1'
+                    ],
+                    'duration' => 180,
+                    'departureTime' => '2023-05-04 13:33:53',
+                    'arrivalTime' => '2023-05-04 16:33:53',
+                    'origin' => 'Taiwan',
+                    'destination' => 'Korea',
+                ],
+            ],
+        ];
+
+        $addedKeys = [
+            'segment.0.booking_reference',
+            'segment.0.boarding_information',
+            'segment.1.booking_reference',
+            'segment.1.boarding_information',
+        ];
+
+        $jsonDiff = new JsonDiff($original, $new);
+
+        $valuesAdded = $jsonDiff->getValuesAdded();
+        $keysAdded = $jsonDiff->getKeysAdded();
+
+        $keysAdded->each(function (KeyAdded $keyAdded) use ($addedKeys) {
+            $this->assertContains($keyAdded->getPath(), $addedKeys);
+        });
+
+        $valuesAdded->each(function (ValueAdded $valueAdded) use ($new) {
+            $this->assertEquals(Arr::get($new, $valueAdded->getPath()), $valueAdded->getValue());
+        });
+
+        $this->assertEmpty($jsonDiff->getKeysRemoved());
+        $this->assertEmpty($jsonDiff->getValuesChanged());
+        $this->assertEmpty($jsonDiff->getValuesRemoved());
+    }
+
+    public function test_remove_nested_element_between_jsons()
+    {
+        $original = [
+            [
+                'id' => '3fe21e46fd78',
+                'company' => 'Alpha Airline',
+                'points' => 20000,
+                'duration' => 862,
+                'segment' => [
+                    0 => [
+                        'booking_reference' => 'AH15243',
+                        'boarding_information' => [
+                            'terminal' => 2,
+                            'gate' => '15'
+                        ],
+                        'duration' => 635,
+                        'departureTime' => '2023-05-04 00:53:35',
+                        'arrivalTime' => '2023-05-04 11:28:53',
+                        'origin' => 'Sydney',
+                        'destination' => 'Taiwan',
+                        'connectionDuration' => 125,
+                    ],
+                    1 => [
+                        'booking_reference' => 'AH35728',
+                        'boarding_information' => [
+                            'terminal' => 1,
+                            'gate' => '1'
+                        ],
+                        'duration' => 180,
+                        'departureTime' => '2023-05-04 13:33:53',
+                        'arrivalTime' => '2023-05-04 16:33:53',
+                        'origin' => 'Taiwan',
+                        'destination' => 'Korea',
                     ],
                 ],
-                [
-                    'name' => 'Tennis',
-                ],
-            ]
-        ];
-
-        $jsonDiff = new JsonDiff($original, $new);
-
-        dd($jsonDiff);
-    }
-
-    public function testMinimalChangesJsonDiffRemoval(): void
-    {
-        $original = [
-            'sports' => [
-                [
-                    'name' => 'Soccer',
-                ],
-                [
-                    'name' => 'Tennis',
-                ],
-            ]
-        ];
-
-        $new = [
-            'sports' => [
-                [
-                    'name' => 'Swimming',
-                ],
-            ]
-        ];
-
-        $jsonDiff = new JsonDiff($original, $new);
-
-        dd($jsonDiff);
-    }
-
-    public function testComplexMinimalChangesJsonDiff()
-    {
-        $original = [
-            'name' => 'Jet Lim',
-            'age' => 23,
-            'birth_date' => '16/07/1980',
-            'passport' => [
-                'id' => 'B12567890',
-                'nationality' => 'Malaysian'
-            ],
-            'sports' => [
-                [
-                    'name' => 'badminton'
-                ],
-                [
-                    'name' => 'soccer'
-                ]
-            ],
-        ];
-
-        $new = [
-            'name' => 'Jet Lim',
-            'age' => 23,
-            'birth_date' => '16/07/1980',
-            'passport' => [
-                'id' => 'B12567890',
-                'nationality' => 'Malaysian'
-            ],
-            'sports' => [
-                [
-                    'name' => 'basketball'
-                ],
-                [
-                    'name' => 'swimming'
-                ],
-                [
-                    'name' => 'cycling'
-                ],
-                [
-                    'name' => 'badminton'
-                ],
-                [
-                    'name' => 'soccer'
-                ]
-            ],
-        ];
-
-        $jsonDiff = new JsonDiff($original, $new);
-
-        dd($jsonDiff);
-    }
-
-    public function testMinimalChangesJsonDiffRemovalOfMultipleElements(): void
-    {
-        $original = [
-            [
-                'flight_reference' => 'AP10622',
-                'booking_reference' => '345-AST-INS',
-                'airline' => 'Alpaca Airline',
-                'flight_date' => '12/12/2024',
-                'destination' => 'Fiji',
-                'flight_time' => '5h30m'
             ],
             [
-                'flight_reference' => 'MH10783',
-                'booking_reference' => '123-MHS-INS',
-                'airline' => 'Koala Airline',
-                'flight_date' => '12/12/2024',
-                'destination' => 'Japan',
-                'flight_time' => '7h30m'
-            ],
-            [
-                'flight_reference' => 'JT12222',
-                'booking_reference' => '222-JTS-INS',
-                'airline' => 'Jet Airline',
-                'flight_date' => '12/12/2024',
-                'destination' => 'France',
-                'flight_time' => '10h45m'
+                'id' => '4fe21e477f78',
+                'company' => 'Beta Airline',
+                'points' => 10000,
+                'duration' => 300,
+                'segment' => [
+                    0 => [
+                        'booking_reference' => 'BH61121',
+                        'boarding_information' => [
+                            'terminal' => 3,
+                            'gate' => '7'
+                        ],
+                        'duration' => 300,
+                        'departureTime' => '2023-05-04 00:53:35',
+                        'arrivalTime' => '2023-05-04 05:53:35',
+                        'origin' => 'Singapore',
+                        'destination' => 'Thailand',
+                    ]
+                ],
             ]
         ];
 
         $new = [
             [
-                'flight_reference' => 'MH10783',
-                'booking_reference' => '123-MHS-INS',
-                'airline' => 'Koala Airline',
-                'flight_date' => '12/12/2024',
-                'destination' => 'Japan',
-                'flight_time' => '7h30m'
-            ],
+                'id' => '4fe21e477f78',
+                'company' => 'Beta Airline',
+                'points' => 10000,
+                'duration' => 300,
+                'segment' => [
+                    0 => [
+                        'booking_reference' => 'BH61121',
+                        'duration' => 300,
+                        'departureTime' => '2023-05-04 00:53:35',
+                        'arrivalTime' => '2023-05-04 05:53:35',
+                        'origin' => 'Singapore',
+                        'destination' => 'Thailand',
+                    ]
+                ],
+            ]
+        ];
+
+        $removedItemsKey = [
+            0,
+            ''
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
-
-        dd($jsonDiff);
+//        dd($jsonDiff->getKeysRemoved());
     }
 }

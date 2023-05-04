@@ -40,7 +40,7 @@ class CalculateAllDifferencesRespectiveToOriginalAction
                         new JsonDiff(
                             $originalValue,
                             $newValue,
-                            $this->getTraversingPathAction->execute($path, $newIndex)
+                            $this->getTraversingPathAction->execute($path, $originalIndex)
                         )
                     )
                 );
