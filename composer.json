@@ -15,7 +15,7 @@
             "Jet\\Tests\\": "tests/"
         },
         "files": [
-            "src/Support/polyfills.php"
+            "tests/Support/polyfills.php"
         ]
     },
     "authors": [
@@ -30,6 +30,7 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6",
-        "symfony/var-dumper": "^5.4"
+        "symfony/var-dumper": "^5.4",
+        "fakerphp/faker": "^1.20"
     }
 }
