@@ -74,6 +74,11 @@ class JsonDiff
         $this->calculateMinimalDiffOfListArrayAction = $this->serviceContainer
             ->make(CalculateMinimalDiffOfListArrayAction::class);
 
+        // Arrays are the same, no differences
+        if (empty($original) && empty($new)) {
+            return;
+        }
+
         if (array_is_list($original) && array_is_list($new)) {
             $this
                 ->mergeChanges(
