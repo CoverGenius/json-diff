@@ -15,9 +15,17 @@ class AddAdditionsToJsonDiffAction
      */
     private $getItemPathAction;
 
-    public function __construct(GetItemPathAction $getItemPathAction)
-    {
+    /**
+     * @var GetUnmappedNewIndexesAction
+     */
+    private $getUnmappedNewIndexesAction;
+
+    public function __construct(
+        GetItemPathAction $getItemPathAction,
+        GetUnmappedNewIndexesAction $getUnmappedNewIndexesAction
+    ) {
         $this->getItemPathAction = $getItemPathAction;
+        $this->getUnmappedNewIndexesAction = $getUnmappedNewIndexesAction;
     }
 
     /**
@@ -29,16 +37,9 @@ class AddAdditionsToJsonDiffAction
      */
     public function execute(Collection $diffMappings, array $new, JsonDiff $jsonDiff, string $path): JsonDiff
     {
-        collect(array_keys($new))
-            ->diff(
-                $diffMappings
-                    ->map(function (?DiffMapping $diffMapping) {
-                        return optional($diffMapping)->getNewIndex();
-                    })
-                    ->filter(function (?int $index) {
-                        return $index !== null;
-                    })
-            )
+        $this
+            ->getUnmappedNewIndexesAction
+            ->execute($diffMappings, $new)
             ->each(function (int $newKey) use ($path, $new, $jsonDiff) {
                 $jsonDiff->addAddedKey($this->getItemPathAction->execute($path, $newKey), $newKey, $new[$newKey]);
             });
