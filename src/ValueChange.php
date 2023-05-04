@@ -21,4 +21,19 @@ class ValueChange
         $this->oldValue = $oldValue;
         $this->newValue = $newValue;
     }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    public function getOldValue()
+    {
+        return $this->oldValue;
+    }
+
+    public function getNewValue()
+    {
+        return $this->newValue;
+    }
 }

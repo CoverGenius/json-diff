@@ -5,12 +5,18 @@
     "autoload": {
         "psr-4": {
             "Jet\\JsonDiff\\": "src/"
-        }
+        },
+        "files": [
+            "src/Support/polyfills.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
             "Jet\\Tests\\": "tests/"
-        }
+        },
+        "files": [
+            "src/Support/polyfills.php"
+        ]
     },
     "authors": [
         {
