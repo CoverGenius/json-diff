@@ -16,13 +16,14 @@ class SelectMinimalOriginalDiffsAction
     public function execute(Collection $diffs): Collection
     {
         $keysProcessedInNewArray = collect();
+        $originalToNewIndexMapping = [];
 
         do {
             $addedMapping = false;
 
-            $diffs->each(function (Collection $diffMappings) use (&$keysProcessedInNewArray, &$addedMapping) {
-                $diffMappings->each(function (DiffMapping $diffMapping) use (&$keysProcessedInNewArray, &$addedMapping) {
-                    // If we find a diff mapping with less changes than an existing mapping, replace it
+            $diffs->each(function (Collection $diffMappings) use (&$originalToNewIndexMapping, &$keysProcessedInNewArray, &$addedMapping) {
+                $diffMappings->each(function (DiffMapping $diffMapping) use (&$originalToNewIndexMapping, &$keysProcessedInNewArray, &$addedMapping) {
+                    // If we find a diff mapping with lesser changes than an existing mapping, replace it
                     if (
                         $keysProcessedInNewArray->has($diffMapping->getNewIndex()) &&
                         $diffMapping
@@ -36,12 +37,32 @@ class SelectMinimalOriginalDiffsAction
                         return;
                     }
 
+                    // If we have an existing diff mapping to the original index with lesser changes than the current
+                    // diff mapping, skip replacing the mapping with the current index
+                    if (
+                        array_key_exists($diffMapping->getOriginalIndex(), $originalToNewIndexMapping) &&
+                        $diffMapping
+                            ->getDiff()
+                            ->getNumberOfChanges() >=
+                        $keysProcessedInNewArray
+                            ->get($originalToNewIndexMapping[$diffMapping->getOriginalIndex()])
+                            ->getDiff()
+                            ->getNumberOfChanges()
+                    ) {
+                        return;
+                    }
+
                     // Add the mapping
                     $keysProcessedInNewArray
                         ->offsetSet(
                             $diffMapping->getNewIndex(),
                             $diffMapping
                         );
+
+                    // Add an original index to new index mapping to track if an original index has been mapped to a new
+                    // index already
+                    $originalToNewIndexMapping[$diffMapping->getOriginalIndex()] = $diffMapping->getNewIndex();
+
                     $addedMapping = true;
                 });
             });
