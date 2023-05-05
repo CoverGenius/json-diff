@@ -15,7 +15,7 @@ class GetUnmappedNewIndexesActionTest extends TestCase
     public function test_it_returns_the_indexes_in_the_new_array_that_were_not_mapped(): void
     {
         // New array has 3 items
-        $newArray = ["a", "b", "c"];
+        $newArray = ['a', 'b', 'c'];
 
         // Only the first item found a mapping from the "original" array
         $diffMappings = collect([

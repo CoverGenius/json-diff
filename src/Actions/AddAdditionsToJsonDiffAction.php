@@ -30,17 +30,13 @@ class AddAdditionsToJsonDiffAction
 
     /**
      * @param Collection<DiffMapping> $diffMappings
-     * @param array $new
-     * @param JsonDiff $jsonDiff
-     * @param string $path
-     * @return JsonDiff
      */
     public function execute(Collection $diffMappings, array $new, JsonDiff $jsonDiff, string $path): JsonDiff
     {
         $this
             ->getUnmappedNewIndexesAction
             ->execute($diffMappings, $new)
-            ->each(function (int $newKey) use ($path, $new, $jsonDiff) {
+            ->each(function (int $newKey) use ($path, $new, $jsonDiff): void {
                 $jsonDiff->addAddedKey($this->getItemPathAction->execute($path, $newKey), $newKey, $new[$newKey]);
             });
 

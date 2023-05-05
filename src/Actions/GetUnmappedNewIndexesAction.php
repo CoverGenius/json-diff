@@ -11,7 +11,6 @@ class GetUnmappedNewIndexesAction
 {
     /**
      * @param Collection<DiffMapping> $diffMappings
-     * @param array $new
      * @return Collection<int>
      */
     public function execute(Collection $diffMappings, array $new): Collection

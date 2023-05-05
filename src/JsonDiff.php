@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Jet\JsonDiff\Actions\CalculateMinimalDiffOfListArrayAction;
 use Jet\JsonDiff\Actions\GetItemPathAction;
 use Jet\JsonDiff\Actions\GetTraversingPathAction;
+use function is_array;
 
 class JsonDiff
 {
@@ -97,19 +98,19 @@ class JsonDiff
         $newKeys = array_keys($new);
 
         $keysAdded = array_diff($newKeys, $originalKeys);
-        collect($keysAdded)->each(function ($key) use ($new, $path) {
+        collect($keysAdded)->each(function ($key) use ($new, $path): void {
             $this->addAddedKey($this->getItemPathAction->execute($path, $key), $key, $new[$key]);
         });
 
         $keysRemoved = array_diff($originalKeys, $newKeys);
-        collect($keysRemoved)->each(function ($key) use ($original, $path) {
+        collect($keysRemoved)->each(function ($key) use ($original, $path): void {
             $this->addRemovedKey($this->getItemPathAction->execute($path, $key), $key, $original[$key]);
         });
 
         $mutualKeys = array_intersect($originalKeys, $newKeys);
         // Check if value has changed
-        collect($mutualKeys)->each(function ($key) use ($new, $original, $path) {
-            // @todo if the value is an object, decide what to do
+        collect($mutualKeys)->each(function ($key) use ($new, $original, $path): void {
+            /** @todo if the value is an object, decide what to do */
             $currentOriginal = $original[$key];
             $currentNew = $new[$key];
 
@@ -124,10 +125,12 @@ class JsonDiff
                                 $this->getTraversingPathAction->execute($path, $key)
                             )
                     );
+
                     return;
                 }
 
                 $this->process($currentOriginal, $currentNew, $this->getTraversingPathAction->execute($path, $key));
+
                 return;
             }
 
@@ -140,12 +143,12 @@ class JsonDiff
     public function getNumberOfChanges(): int
     {
         return
-            $this->keysAdded->count() +
-            $this->keysRemoved->count() +
-            $this->valuesChanged->count();
+            $this->keysAdded->count()
+            + $this->keysRemoved->count()
+            + $this->valuesChanged->count();
     }
 
-    public function mergeChanges(JsonDiff $jsonDiff): void
+    public function mergeChanges(self $jsonDiff): void
     {
         $this->keysAdded = $this->keysAdded->merge($jsonDiff->getKeysAdded());
         $this->keysRemoved = $this->keysRemoved->merge($jsonDiff->getKeysRemoved());
@@ -155,12 +158,11 @@ class JsonDiff
     }
 
     /**
-     * @param string $path
-     * @param string|int $keyName
+     * @param int|string $keyName
      * @param $value
      * @return $this
      */
-    public function addAddedKey(string $path, $keyName, $value): JsonDiff
+    public function addAddedKey(string $path, $keyName, $value): self
     {
         $this->keysAdded->push(new KeyAdded($path, $keyName));
         $this->valuesAdded->push(new ValueAdded($path, $value));
@@ -169,12 +171,11 @@ class JsonDiff
     }
 
     /**
-     * @param string $path
-     * @param string|int $name
+     * @param int|string $name
      * @param $value
      * @return $this
      */
-    public function addRemovedKey(string $path, $name, $value): JsonDiff
+    public function addRemovedKey(string $path, $name, $value): self
     {
         $this->keysRemoved->push(new KeyRemoved($path, $name));
         $this->valuesRemoved->push(new ValueRemoved($path, $value));
@@ -207,4 +208,3 @@ class JsonDiff
         return $this->valuesChanged;
     }
 }
-

@@ -11,14 +11,13 @@ class MergeDiffsAction
 {
     /**
      * @param Collection<JsonDiff> $diffs
-     * @return JsonDiff
      */
     public function execute(Collection $diffs): JsonDiff
     {
         /** @var JsonDiff $mergedDiff */
         $mergedDiff = $diffs->shift();
         $diffs
-            ->each(function (JsonDiff $diff) use ($mergedDiff) {
+            ->each(function (JsonDiff $diff) use ($mergedDiff): void {
                 $mergedDiff->mergeChanges($diff);
             });
 

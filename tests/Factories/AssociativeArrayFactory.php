@@ -8,7 +8,7 @@ use Illuminate\Support\Arr;
 
 class AssociativeArrayFactory
 {
-    public static function new(): AssociativeArrayFactory
+    public static function new(): self
     {
         return new self();
     }
@@ -24,8 +24,8 @@ class AssociativeArrayFactory
             'is_active' => Arr::random([false, true]),
             'abn' => Arr::random([
                 null,
-                (string) fake()->numberBetween()
-            ])
+                (string) fake()->numberBetween(),
+            ]),
         ];
     }
 }

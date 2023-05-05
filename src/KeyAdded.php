@@ -12,7 +12,7 @@ class KeyAdded
     private $path;
 
     /**
-     * @var string|int
+     * @var int|string
      */
     private $name;
 

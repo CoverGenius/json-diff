@@ -8,18 +8,20 @@ declare(strict_types=1);
  */
 
 /**
- * Introduced in PHP 8.1
+ * Introduced in PHP 8.1.
  * @see https://www.php.net/manual/en/function.array-is-list.php
  */
-if (!function_exists("array_is_list")) {
+if (! \function_exists('array_is_list')) {
     function array_is_list(array $array): bool
     {
         $i = 0;
+
         foreach ($array as $k => $v) {
             if ($k !== $i++) {
                 return false;
             }
         }
+
         return true;
     }
 }

@@ -25,10 +25,11 @@ class SportsArrayFactory
      */
     protected $length = 2;
 
-    public static function new(): SportsArrayFactory
+    public static function new(): self
     {
         $factory = new self();
         $factory->sports = Arr::shuffle($factory->sports);
+
         return $factory;
     }
 
@@ -38,10 +39,10 @@ class SportsArrayFactory
             $this->sports,
             0,
             $this->length
-            );
+        );
     }
 
-    public function withSports(array $sports): SportsArrayFactory
+    public function withSports(array $sports): self
     {
         $clone = clone $this;
 
@@ -50,7 +51,7 @@ class SportsArrayFactory
         return $clone;
     }
 
-    public function length(int $length = 2): SportsArrayFactory
+    public function length(int $length = 2): self
     {
         $clone = clone $this;
 

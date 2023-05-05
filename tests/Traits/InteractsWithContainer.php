@@ -14,7 +14,7 @@ trait InteractsWithContainer
     {
         return tap(
             $this->createStub($className),
-            function (Stub $stub) use ($className) {
+            function (Stub $stub) use ($className): void {
                 Container::getInstance()
                     ->bind(
                         $className,
@@ -30,7 +30,7 @@ trait InteractsWithContainer
     {
         return tap(
             $this->createMock($className),
-            function (MockObject $stub) use ($className) {
+            function (MockObject $stub) use ($className): void {
                 Container::getInstance()
                     ->bind(
                         $className,

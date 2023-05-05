@@ -32,6 +32,7 @@ class CalculateAllDifferencesRespectiveToOriginalAction
 
         foreach ($original as $originalIndex => $originalValue) {
             $diffs = collect();
+
             foreach ($new as $newIndex => $newValue) {
                 $diffs->push(
                     new DiffMapping(
