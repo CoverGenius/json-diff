@@ -11,13 +11,13 @@ use Jet\JsonDiff\JsonDiff;
 class CalculateAllDifferencesRespectiveToOriginalAction
 {
     /**
-     * @var GetTraversingPathAction
+     * @var GetItemPathAction
      */
-    private $getTraversingPathAction;
+    private $getItemPathAction;
 
-    public function __construct(GetTraversingPathAction $getTraversingPathAction)
+    public function __construct(GetItemPathAction $getItemPathAction)
     {
-        $this->getTraversingPathAction = $getTraversingPathAction;
+        $this->getItemPathAction = $getItemPathAction;
     }
 
     /**
@@ -41,7 +41,7 @@ class CalculateAllDifferencesRespectiveToOriginalAction
                         new JsonDiff(
                             $originalValue,
                             $newValue,
-                            $this->getTraversingPathAction->execute($path, $originalIndex)
+                            $this->getItemPathAction->execute($path, $originalIndex)
                         )
                     )
                 );

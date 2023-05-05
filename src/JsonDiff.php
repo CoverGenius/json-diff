@@ -8,7 +8,6 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
 use Jet\JsonDiff\Actions\CalculateMinimalDiffOfListArrayAction;
 use Jet\JsonDiff\Actions\GetItemPathAction;
-use Jet\JsonDiff\Actions\GetTraversingPathAction;
 use function is_array;
 
 class JsonDiff
@@ -44,11 +43,6 @@ class JsonDiff
     private $serviceContainer;
 
     /**
-     * @var GetTraversingPathAction
-     */
-    private $getTraversingPathAction;
-
-    /**
      * @var GetItemPathAction
      */
     private $getItemPathAction;
@@ -72,8 +66,6 @@ class JsonDiff
 
         $this->serviceContainer = Container::getInstance();
 
-        $this->getTraversingPathAction = $this->serviceContainer
-            ->make(GetTraversingPathAction::class);
         $this->getItemPathAction = $this->serviceContainer
             ->make(GetItemPathAction::class);
         $this->calculateMinimalDiffOfListArrayAction = $this->serviceContainer
@@ -139,14 +131,14 @@ class JsonDiff
                             ->execute(
                                 $currentOriginal,
                                 $currentNew,
-                                $this->getTraversingPathAction->execute($path, $key)
+                                $this->getItemPathAction->execute($path, $key)
                             )
                     );
 
                     return;
                 }
 
-                $this->process($currentOriginal, $currentNew, $this->getTraversingPathAction->execute($path, $key));
+                $this->process($currentOriginal, $currentNew, $this->getItemPathAction->execute($path, $key));
 
                 return;
             }
