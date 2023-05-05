@@ -144,7 +144,6 @@ class JsonDiffTest extends TestCase
         $this->assertSame(2, $jsonDiff->getKeysAdded()->count());
 
         $keysAdded = $jsonDiff->getKeysAdded();
-        dd($keysAdded, $jsonDiff);
         $valuesAdded = $jsonDiff->getValuesAdded();
 
         // Check that the new keys are added
@@ -609,6 +608,162 @@ class JsonDiffTest extends TestCase
                     $valueChange->getPath()
                 );
             }
+        }
+    }
+
+    public function test_basic_array_list(): void
+    {
+        $originalArray = [0, 1, 2];
+        $newArray = [0, 1, 3];
+        $jsonDiff = new JsonDiff($originalArray, $newArray);
+        $this->assertCount(
+            1,
+            $jsonDiff->getValuesChanged()
+        );
+        $this->assertSame(
+            1,
+            $jsonDiff->getNumberOfChanges()
+        );
+
+        /** @var ValueChange $valueChanged */
+        $valueChanged = $jsonDiff->getValuesChanged()->first();
+        $this->assertSame(
+            '2',
+            $valueChanged->getPath()
+        );
+        $this->assertSame(
+            2,
+            $valueChanged->getOldValue()
+        );
+        $this->assertSame(
+            3,
+            $valueChanged->getNewValue()
+        );
+    }
+
+    public function test_diff_between_scalar_type_and_array(): void
+    {
+        $original = 'a string';
+        $new = [0, 1, 2];
+
+        $jsonDiff = new JsonDiff($original, $new);
+
+        $this->assertSame(
+            1,
+            $jsonDiff->getNumberOfChanges()
+        );
+
+        /** @var ValueChange $valueChange */
+        $valueChange = $jsonDiff->getValuesChanged()->first();
+        $this->assertSame(
+            $original,
+            $valueChange->getOldValue()
+        );
+        $this->assertSame(
+            $new,
+            $valueChange->getNewValue()
+        );
+        $this->assertSame(
+            '',
+            $valueChange->getPath()
+        );
+
+        // Reverse the diff
+        $original = [0, 1, 2];
+        $new = 'a string';
+
+        $jsonDiff = new JsonDiff($original, $new);
+
+        $this->assertSame(
+            1,
+            $jsonDiff->getNumberOfChanges()
+        );
+
+        /** @var ValueChange $valueChange */
+        $valueChange = $jsonDiff->getValuesChanged()->first();
+        $this->assertSame(
+            $original,
+            $valueChange->getOldValue()
+        );
+        $this->assertSame(
+            $new,
+            $valueChange->getNewValue()
+        );
+        $this->assertSame(
+            '',
+            $valueChange->getPath()
+        );
+    }
+
+    public function test_path_generation(): void
+    {
+        $dataSets = [
+            [
+                'original' => 'a string',
+                'new' => 'another string',
+                'expectedPath' => ''
+            ],
+            [
+                'original' => [0],
+                'new' => [1],
+                'expectedPath' => '0'
+            ],
+            [
+                'original' => [
+                    'name' => 'Bill Gates',
+                    'sports' => [
+                        'soccer',
+                        'rugby',
+                    ]
+                ],
+                'new' => [
+                    'name' => 'Bill Gates',
+                    'sports' => [
+                        'soccer',
+                        'tennis',
+                    ]
+                ],
+                'expectedPath' => 'sports.1'
+            ],
+            [
+                'original' => [
+                    [
+                        'name' => 'Bill Gates',
+                        'children' => [
+                            [
+                                'name' => 'Alice Gates',
+                                'sports' => [
+                                    'soccer',
+                                    'rugby',
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'new' => [
+                    [
+                        'name' => 'Bill Gates',
+                        'children' => [
+                            [
+                                'name' => 'Alice Gates',
+                                'sports' => [
+                                    'soccer',
+                                    'tennis',
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'expectedPath' => '0.children.0.sports.1'
+            ],
+        ];
+
+        foreach ($dataSets as $dataSet) {
+            $jsonDiff = new JsonDiff($dataSet['original'], $dataSet['new']);
+            $this->assertCount(1, $jsonDiff->getValuesChanged());
+            /** @var ValueChange $valueChange */
+            $valueChange = $jsonDiff->getValuesChanged()->first();
+            $this->assertSame($dataSet['expectedPath'], $valueChange->getPath());
         }
     }
 }
