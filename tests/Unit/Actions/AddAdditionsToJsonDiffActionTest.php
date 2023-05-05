@@ -8,6 +8,7 @@ use Illuminate\Container\Container;
 use Jet\JsonDiff\Actions\AddAdditionsToJsonDiffAction;
 use Jet\JsonDiff\Actions\GetUnmappedNewIndexesAction;
 use Jet\JsonDiff\JsonDiff;
+use Jet\JsonDiff\ValueAdded;
 use Jet\Tests\Traits\InteractsWithContainer;
 use PHPUnit\Framework\TestCase;
 
@@ -43,5 +44,16 @@ class AddAdditionsToJsonDiffActionTest extends TestCase
             );
 
         $this->assertCount(1, $jsonDiff->getValuesAdded());
+
+        /** @var ValueAdded $valueAdded */
+        $valueAdded = $jsonDiff->getValuesAdded()->first();
+        $this->assertSame(
+            '1',
+            $valueAdded->getPath()
+        );
+        $this->assertSame(
+            'unmapped',
+            $valueAdded->getValue()
+        );
     }
 }
