@@ -64,7 +64,7 @@ $rules = [
         'spacing' => 'one',
     ],
     'date_time_immutable' => true,
-    'declare_strict_types' => false, // This will fail in many places so we will turn this on gradually
+    'declare_strict_types' => true,
     'dir_constant' => true,
     'echo_tag_syntax' => true,
     'ereg_to_preg' => true,
