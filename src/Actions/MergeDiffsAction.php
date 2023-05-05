@@ -10,17 +10,16 @@ use Jet\JsonDiff\JsonDiff;
 class MergeDiffsAction
 {
     /**
-     * @param Collection<JsonDiff> $diffs
+     * @param Collection<JsonDiff> $jsonDiffs
      */
-    public function execute(Collection $diffs): JsonDiff
+    public function execute(Collection $jsonDiffs): JsonDiff
     {
-        /** @var JsonDiff $mergedDiff */
-        $mergedDiff = $diffs->shift();
-        $diffs
-            ->each(function (JsonDiff $diff) use ($mergedDiff): void {
-                $mergedDiff->mergeChanges($diff);
+        $mergedJsonDiff = new JsonDiff([], []);
+        $jsonDiffs
+            ->each(function (JsonDiff $jsonDiff) use ($mergedJsonDiff): void {
+                $mergedJsonDiff->mergeChanges($jsonDiff);
             });
 
-        return $mergedDiff;
+        return $mergedJsonDiff;
     }
 }
