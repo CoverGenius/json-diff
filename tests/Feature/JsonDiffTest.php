@@ -523,4 +523,92 @@ class JsonDiffTest extends TestCase
         $jsonDiff = new JsonDiff($original, $new);
 //        dd($jsonDiff->getKeysRemoved());
     }
+
+    public function test_json_diff_with_scalar_types(): void
+    {
+        $dataSets = [
+            'string' => [
+                'original' => 'Original String',
+                'new' => 'New String',
+                'changes' => 1,
+            ],
+            'number' => [
+                'original' => 1,
+                'new' => 2,
+                'changes' => 1,
+            ],
+            'boolean' => [
+                'original' => true,
+                'new' => false,
+                'changes' => 1,
+            ],
+            'null' => [
+                'original' => null,
+                'new' => null,
+                'changes' => 0,
+            ],
+        ];
+
+        // Compare same data types
+        foreach ($dataSets as $dataSet) {
+            $jsonDiff = new JsonDiff($dataSet['original'], $dataSet['new']);
+            $this->assertCount($dataSet['changes'], $jsonDiff->getValuesChanged());
+            $this->assertSame($dataSet['changes'], $jsonDiff->getNumberOfChanges());
+            $this->assertCount(0, $jsonDiff->getKeysAdded());
+            $this->assertCount(0, $jsonDiff->getKeysRemoved());
+            $this->assertCount(0, $jsonDiff->getValuesAdded());
+            $this->assertCount(0, $jsonDiff->getValuesRemoved());
+
+            if (! $dataSet['changes']) {
+                continue;
+            }
+
+            /** @var ValueChange $valueChange */
+            $valueChange = $jsonDiff->getValuesChanged()->first();
+            $this->assertSame(
+                $dataSet['original'],
+                $valueChange->getOldValue()
+            );
+            $this->assertSame(
+                $dataSet['new'],
+                $valueChange->getNewValue()
+            );
+            $this->assertSame(
+                '',
+                $valueChange->getPath()
+            );
+        }
+
+        // Compare different data types
+        foreach ($dataSets as $dataType => $dataSet) {
+            foreach ($dataSets as $subDataType => $subDataSet) {
+                if ($dataType === $subDataType) {
+                    continue;
+                }
+
+                $jsonDiff = new JsonDiff($dataSet['original'], $subDataSet['original']);
+                $this->assertCount(1, $jsonDiff->getValuesChanged());
+                $this->assertSame(1, $jsonDiff->getNumberOfChanges());
+                $this->assertCount(0, $jsonDiff->getKeysAdded());
+                $this->assertCount(0, $jsonDiff->getKeysRemoved());
+                $this->assertCount(0, $jsonDiff->getValuesAdded());
+                $this->assertCount(0, $jsonDiff->getValuesRemoved());
+
+                /** @var ValueChange $valueChange */
+                $valueChange = $jsonDiff->getValuesChanged()->first();
+                $this->assertSame(
+                    $dataSet['original'],
+                    $valueChange->getOldValue()
+                );
+                $this->assertSame(
+                    $subDataSet['original'],
+                    $valueChange->getNewValue()
+                );
+                $this->assertSame(
+                    '',
+                    $valueChange->getPath()
+                );
+            }
+        }
+    }
 }

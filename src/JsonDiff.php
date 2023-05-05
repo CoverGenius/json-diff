@@ -58,7 +58,11 @@ class JsonDiff
      */
     private $calculateMinimalDiffOfListArrayAction;
 
-    public function __construct(array $original, array $new, string $startingPath = '')
+    /**
+     * @param array|bool|float|int|string|null $original
+     * @param array|bool|float|int|string|null $new
+     */
+    public function __construct($original, $new, string $startingPath = '')
     {
         $this->keysAdded = collect();
         $this->keysRemoved = collect();
@@ -75,8 +79,21 @@ class JsonDiff
         $this->calculateMinimalDiffOfListArrayAction = $this->serviceContainer
             ->make(CalculateMinimalDiffOfListArrayAction::class);
 
-        // Arrays are the same, no differences
-        if (empty($original) && empty($new)) {
+        // No differences
+        if ($original === $new) {
+            return;
+        }
+
+        // If either is not an array, just a value change occurred
+        if (! is_array($original) || ! is_array($new)) {
+            $this->valuesChanged->push(
+                new ValueChange(
+                    $startingPath,
+                    $original,
+                    $new
+                )
+            );
+
             return;
         }
 
@@ -183,26 +200,41 @@ class JsonDiff
         return $this;
     }
 
+    /**
+     * @return Collection<KeyAdded>
+     */
     public function getKeysAdded(): Collection
     {
         return $this->keysAdded;
     }
 
+    /**
+     * @return Collection<KeyRemoved>
+     */
     public function getKeysRemoved(): Collection
     {
         return $this->keysRemoved;
     }
 
+    /**
+     * @return Collection<ValueAdded>
+     */
     public function getValuesAdded(): Collection
     {
         return $this->valuesAdded;
     }
 
+    /**
+     * @return Collection<ValueRemoved>
+     */
     public function getValuesRemoved(): Collection
     {
         return $this->valuesRemoved;
     }
 
+    /**
+     * @return Collection<ValueChange>
+     */
     public function getValuesChanged(): Collection
     {
         return $this->valuesChanged;
