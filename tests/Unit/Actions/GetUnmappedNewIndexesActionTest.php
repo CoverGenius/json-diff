@@ -12,16 +12,6 @@ use PHPUnit\Framework\TestCase;
 
 class GetUnmappedNewIndexesActionTest extends TestCase
 {
-    /** @var GetUnmappedNewIndexesAction */
-    protected $action;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->action = Container::getInstance()->make(GetUnmappedNewIndexesAction::class);
-    }
-
     public function test_it_returns_the_indexes_in_the_new_array_that_were_not_mapped(): void
     {
         // New array has 3 items
@@ -32,7 +22,9 @@ class GetUnmappedNewIndexesActionTest extends TestCase
             new DiffMapping(0, 0, $this->createMock(JsonDiff::class)),
         ]);
 
-        $unmappedIndexes = $this->action->execute($diffMappings, $newArray);
+        /** @var GetUnmappedNewIndexesAction $action */
+        $action = Container::getInstance()->make(GetUnmappedNewIndexesAction::class);
+        $unmappedIndexes = $action->execute($diffMappings, $newArray);
 
         // There should be 2 unmapped items at index 1 and 2 of the new array
         $this->assertCount(2, $unmappedIndexes);
