@@ -11,7 +11,7 @@ class GetItemPathAction
      */
     public function execute(string $currentPath, $key): string
     {
-        if ($currentPath === "") {
+        if ($currentPath === '') {
             return "{$key}";
         }
 
