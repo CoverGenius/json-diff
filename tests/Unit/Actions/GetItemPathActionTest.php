@@ -19,7 +19,7 @@ class GetItemPathActionTest extends TestCase
         );
         $this->assertSame(
             '0.name',
-            $action->execute('0.', 'name')
+            $action->execute('0', 'name')
         );
     }
 }
