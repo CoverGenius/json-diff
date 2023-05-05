@@ -16,7 +16,7 @@ class SelectMinimalOriginalDiffsAction
     public function execute(Collection $diffs): Collection
     {
         $keysProcessedInNewArray = collect();
-        $originalToNewIndexMapping = [];
+        $originalToNewIndexMapping = collect();
 
         do {
             $addedMapping = false;
@@ -40,12 +40,12 @@ class SelectMinimalOriginalDiffsAction
                     // If we have an existing diff mapping to the original index with lesser changes than the current
                     // diff mapping, skip replacing the mapping with the current index
                     if (
-                        array_key_exists($diffMapping->getOriginalIndex(), $originalToNewIndexMapping) &&
+                        $originalToNewIndexMapping->has($diffMapping->getOriginalIndex()) &&
                         $diffMapping
                             ->getDiff()
                             ->getNumberOfChanges() >=
                         $keysProcessedInNewArray
-                            ->get($originalToNewIndexMapping[$diffMapping->getOriginalIndex()])
+                            ->get($originalToNewIndexMapping->get($diffMapping->getOriginalIndex()))
                             ->getDiff()
                             ->getNumberOfChanges()
                     ) {
@@ -61,7 +61,11 @@ class SelectMinimalOriginalDiffsAction
 
                     // Add an original index to new index mapping to track if an original index has been mapped to a new
                     // index already
-                    $originalToNewIndexMapping[$diffMapping->getOriginalIndex()] = $diffMapping->getNewIndex();
+                    $originalToNewIndexMapping
+                        ->offsetSet(
+                            $diffMapping->getOriginalIndex(),
+                            $diffMapping->getNewIndex()
+                        );
 
                     $addedMapping = true;
                 });
