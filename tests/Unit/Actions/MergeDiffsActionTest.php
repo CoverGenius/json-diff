@@ -8,7 +8,7 @@ use Illuminate\Container\Container;
 use Jet\JsonDiff\Actions\MergeDiffsAction;
 use Jet\JsonDiff\JsonDiff;
 use Jet\Tests\Factories\JsonDiffFactory;
-use PHPUnit\Framework\TestCase;
+use Jet\Tests\TestCase;
 
 class MergeDiffsActionTest extends TestCase
 {

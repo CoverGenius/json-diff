@@ -41,4 +41,11 @@ trait InteractsWithContainer
             }
         );
     }
+
+    protected function flush(): self
+    {
+        Container::getInstance()->flush();
+
+        return $this;
+    }
 }

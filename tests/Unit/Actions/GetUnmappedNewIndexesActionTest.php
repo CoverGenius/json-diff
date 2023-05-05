@@ -8,7 +8,7 @@ use Illuminate\Container\Container;
 use Jet\JsonDiff\Actions\GetUnmappedNewIndexesAction;
 use Jet\JsonDiff\DiffMapping;
 use Jet\JsonDiff\JsonDiff;
-use PHPUnit\Framework\TestCase;
+use Jet\Tests\TestCase;
 
 class GetUnmappedNewIndexesActionTest extends TestCase
 {

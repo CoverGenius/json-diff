@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Jet\Tests\Unit;
 
 use Jet\JsonDiff\JsonDiff;
-use PHPUnit\Framework\TestCase;
+use Jet\Tests\TestCase;
 
 class JsonDiffTest extends TestCase
 {
@@ -18,8 +18,8 @@ class JsonDiffTest extends TestCase
         );
 
         $jsonDiff = new JsonDiff(
-            ["apple"],
-            ["orange"]
+            ['apple'],
+            ['orange']
         );
         $this->assertSame(
             1,

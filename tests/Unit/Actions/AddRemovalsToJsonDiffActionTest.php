@@ -9,13 +9,10 @@ use Jet\JsonDiff\Actions\AddRemovalsToJsonDiffAction;
 use Jet\JsonDiff\Actions\GetUnmappedOriginalIndexesAction;
 use Jet\JsonDiff\JsonDiff;
 use Jet\JsonDiff\ValueRemoved;
-use Jet\Tests\Traits\InteractsWithContainer;
-use PHPUnit\Framework\TestCase;
+use Jet\Tests\TestCase;
 
 class AddRemovalsToJsonDiffActionTest extends TestCase
 {
-    use InteractsWithContainer;
-
     public function test_it_adds_removals_to_a_json_diff(): void
     {
         $originalArray = [

@@ -11,7 +11,7 @@ use Jet\JsonDiff\KeyRemoved;
 use Jet\JsonDiff\ValueAdded;
 use Jet\JsonDiff\ValueChange;
 use Jet\JsonDiff\ValueRemoved;
-use PHPUnit\Framework\TestCase;
+use Jet\Tests\TestCase;
 
 class JsonDiffTest extends TestCase
 {
@@ -701,12 +701,12 @@ class JsonDiffTest extends TestCase
             [
                 'original' => 'a string',
                 'new' => 'another string',
-                'expectedPath' => ''
+                'expectedPath' => '',
             ],
             [
                 'original' => [0],
                 'new' => [1],
-                'expectedPath' => '0'
+                'expectedPath' => '0',
             ],
             [
                 'original' => [
@@ -714,16 +714,16 @@ class JsonDiffTest extends TestCase
                     'sports' => [
                         'soccer',
                         'rugby',
-                    ]
+                    ],
                 ],
                 'new' => [
                     'name' => 'Bill Gates',
                     'sports' => [
                         'soccer',
                         'tennis',
-                    ]
+                    ],
                 ],
-                'expectedPath' => 'sports.1'
+                'expectedPath' => 'sports.1',
             ],
             [
                 'original' => [
@@ -735,10 +735,10 @@ class JsonDiffTest extends TestCase
                                 'sports' => [
                                     'soccer',
                                     'rugby',
-                                ]
-                            ]
-                        ]
-                    ]
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
                 'new' => [
                     [
@@ -749,12 +749,12 @@ class JsonDiffTest extends TestCase
                                 'sports' => [
                                     'soccer',
                                     'tennis',
-                                ]
-                            ]
-                        ]
-                    ]
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
-                'expectedPath' => '0.children.0.sports.1'
+                'expectedPath' => '0.children.0.sports.1',
             ],
         ];
 

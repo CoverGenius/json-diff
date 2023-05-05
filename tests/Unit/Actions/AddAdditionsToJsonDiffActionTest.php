@@ -9,13 +9,10 @@ use Jet\JsonDiff\Actions\AddAdditionsToJsonDiffAction;
 use Jet\JsonDiff\Actions\GetUnmappedNewIndexesAction;
 use Jet\JsonDiff\JsonDiff;
 use Jet\JsonDiff\ValueAdded;
-use Jet\Tests\Traits\InteractsWithContainer;
-use PHPUnit\Framework\TestCase;
+use Jet\Tests\TestCase;
 
 class AddAdditionsToJsonDiffActionTest extends TestCase
 {
-    use InteractsWithContainer;
-
     public function test_it_adds_additions_to_a_json_diff(): void
     {
         $newArray = [

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Jet\Tests\Unit\Actions;
 
 use Jet\JsonDiff\Actions\GetItemPathAction;
-use PHPUnit\Framework\TestCase;
+use Jet\Tests\TestCase;
 
 class GetItemPathActionTest extends TestCase
 {
