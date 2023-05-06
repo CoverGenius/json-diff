@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Jet\JsonDiff\Actions;
 
-use Illuminate\Support\Collection;
-use Jet\JsonDiff\DiffMapping;
 use Jet\JsonDiff\JsonDiff;
 
 class CalculateMinimalDiffOfListArrayAction

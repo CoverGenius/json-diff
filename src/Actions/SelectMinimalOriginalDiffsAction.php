@@ -21,15 +21,15 @@ class SelectMinimalOriginalDiffsAction
         do {
             $addedMapping = false;
 
-            $diffs->each(function (Collection $diffMappings) use (&$originalToNewIndexMapping, &$keysProcessedInNewArray, &$addedMapping) {
-                $diffMappings->each(function (DiffMapping $diffMapping) use (&$originalToNewIndexMapping, &$keysProcessedInNewArray, &$addedMapping) {
+            $diffs->each(function (Collection $diffMappings) use (&$originalToNewIndexMapping, &$keysProcessedInNewArray, &$addedMapping): void {
+                $diffMappings->each(function (DiffMapping $diffMapping) use (&$originalToNewIndexMapping, &$keysProcessedInNewArray, &$addedMapping): void {
                     // If we find a diff mapping with lesser changes than an existing mapping, replace it
                     if (
-                        $keysProcessedInNewArray->has($diffMapping->getNewIndex()) &&
-                        $diffMapping
+                        $keysProcessedInNewArray->has($diffMapping->getNewIndex())
+                        && $diffMapping
                             ->getDiff()
-                            ->getNumberOfChanges() >=
-                        $keysProcessedInNewArray
+                            ->getNumberOfChanges()
+                        >= $keysProcessedInNewArray
                             ->get($diffMapping->getNewIndex())
                             ->getDiff()
                             ->getNumberOfChanges()
@@ -40,11 +40,11 @@ class SelectMinimalOriginalDiffsAction
                     // If we have an existing diff mapping to the original index with lesser changes than the current
                     // diff mapping, skip replacing the mapping with the current index
                     if (
-                        $originalToNewIndexMapping->has($diffMapping->getOriginalIndex()) &&
-                        $diffMapping
+                        $originalToNewIndexMapping->has($diffMapping->getOriginalIndex())
+                        && $diffMapping
                             ->getDiff()
-                            ->getNumberOfChanges() >=
-                        $keysProcessedInNewArray
+                            ->getNumberOfChanges()
+                        >= $keysProcessedInNewArray
                             ->get($originalToNewIndexMapping->get($diffMapping->getOriginalIndex()))
                             ->getDiff()
                             ->getNumberOfChanges()

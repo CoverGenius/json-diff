@@ -11,7 +11,7 @@ class KeyRemoved
      */
     private $path;
     /**
-     * @var string|int
+     * @var int|string
      */
     private $name;
 

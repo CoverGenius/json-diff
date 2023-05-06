@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Jet\Tests\Factories;
 
+use function count;
+
 class ListArrayFactory
 {
     /**
@@ -11,7 +13,7 @@ class ListArrayFactory
      */
     protected $length = 1;
 
-    public static function new(): ListArrayFactory
+    public static function new(): self
     {
         return new self();
     }
@@ -20,7 +22,7 @@ class ListArrayFactory
     {
         $array = [];
 
-        for($i = 0; $i < $this->length - count($extra); $i++) {
+        for ($i = 0; $i < $this->length - count($extra); $i++) {
             $array[] = AssociativeArrayFactory::new()->create();
         }
 
@@ -31,10 +33,11 @@ class ListArrayFactory
         return $array;
     }
 
-    public function length(int $length = 1): ListArrayFactory
+    public function length(int $length = 1): self
     {
         $clone = clone $this;
         $clone->length = $length;
+
         return $clone;
     }
 }

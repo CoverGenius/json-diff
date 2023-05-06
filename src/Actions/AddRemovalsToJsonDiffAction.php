@@ -32,7 +32,7 @@ class AddRemovalsToJsonDiffAction
         $this
             ->getUnmappedOriginalIndexesAction
             ->execute($diffMappings, $original)
-            ->each(function (int $originalKey) use ($original, $path, $jsonDiff) {
+            ->each(function (int $originalKey) use ($original, $path, $jsonDiff): void {
                 $jsonDiff->addRemovedKey($this->getItemPathAction->execute($path, $originalKey), $originalKey, $original[$originalKey]);
             });
 

@@ -11,13 +11,12 @@ class GetDiffsFromDiffMappingsAction
 {
     /**
      * @param Collection<DiffMapping> $diffMappings
-     * @return Collection
      */
     public function execute(Collection $diffMappings): Collection
     {
         $jsonDiffs = collect();
         $diffMappings
-            ->each(function (?DiffMapping $diffMapping) use (&$jsonDiffs) {
+            ->each(function (?DiffMapping $diffMapping) use (&$jsonDiffs): void {
                 if ($diffMapping) {
                     $jsonDiffs->push($diffMapping->getDiff());
                 }

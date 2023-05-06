@@ -6,12 +6,12 @@ namespace Jet\JsonDiff\Actions;
 
 use Illuminate\Support\Collection;
 use Jet\JsonDiff\DiffMapping;
+use function count;
 
 class GetSortedOriginalDiffMappingsAction
 {
     /**
      * @param Collection<DiffMapping> $diffMappings
-     * @param array $original
      * @return Collection<DiffMapping>
      */
     public function execute(Collection $diffMappings, array $original): Collection

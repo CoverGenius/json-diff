@@ -11,7 +11,6 @@ class GetUnmappedOriginalIndexesAction
 {
     /**
      * @param Collection<DiffMapping> $diffMappings
-     * @param array $original
      * @return Collection<int>
      */
     public function execute(Collection $diffMappings, array $original): Collection
