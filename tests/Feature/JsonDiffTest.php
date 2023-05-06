@@ -125,7 +125,7 @@ class JsonDiffTest extends TestCase
 
         $addedItems = [
             '0',
-            '2'
+            '2',
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
@@ -236,7 +236,7 @@ class JsonDiffTest extends TestCase
 
         $removedItems = [
             '0',
-            '2'
+            '2',
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
@@ -248,7 +248,7 @@ class JsonDiffTest extends TestCase
         $this->assertSame(2, $jsonDiff->getKeysRemoved()->count());
 
         // Check that the correct keys are removed
-        $keysRemoved->each(function (KeyRemoved $keyRemoved) use ($removedItems) {
+        $keysRemoved->each(function (KeyRemoved $keyRemoved) use ($removedItems): void {
             $this->assertContains($keyRemoved->getPath(), $removedItems);
         });
 
@@ -597,7 +597,7 @@ class JsonDiffTest extends TestCase
                         'arrivalTime' => '2023-07-04 14:00:00',
                         'origin' => 'Sydney',
                         'destination' => 'Jakarta',
-                    ]
+                    ],
                 ],
             ],
             [
@@ -638,7 +638,7 @@ class JsonDiffTest extends TestCase
         ];
 
         $addedItems = [
-            '1'
+            '1',
         ];
 
         $changedItems = [
@@ -650,13 +650,13 @@ class JsonDiffTest extends TestCase
             '0.segment.0.duration',
             '0.segment.0.departureTime',
             '0.segment.0.arrivalTime',
-            '0.segment.0.destination'
+            '0.segment.0.destination',
         ];
 
         $removedItems = [
             '0.segment.1',
             '1.segment.0.booking_reference',
-            '1.segment.0.boarding_information'
+            '1.segment.0.boarding_information',
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
@@ -670,25 +670,25 @@ class JsonDiffTest extends TestCase
         $valuesChanged = $jsonDiff->getValuesChanged();
 
         // Check that the correct keys and values are added
-        $keysAdded->each(function (KeyAdded $keyAdded) use ($addedItems) {
+        $keysAdded->each(function (KeyAdded $keyAdded) use ($addedItems): void {
             $this->assertContains($keyAdded->getPath(), $addedItems);
         });
 
-        $valuesAdded->each(function (ValueAdded $valueAdded) use ($new) {
+        $valuesAdded->each(function (ValueAdded $valueAdded) use ($new): void {
             $this->assertSame(Arr::get($new, $valueAdded->getPath()), $valueAdded->getValue());
         });
 
         // Check that the correct keys and values are removed
-        $keysRemoved->each(function (KeyRemoved $keyRemoved) use ($removedItems) {
+        $keysRemoved->each(function (KeyRemoved $keyRemoved) use ($removedItems): void {
             $this->assertContains($keyRemoved->getPath(), $removedItems);
         });
 
-        $valuesRemoved->each(function (ValueRemoved $valueRemoved) use ($original) {
+        $valuesRemoved->each(function (ValueRemoved $valueRemoved) use ($original): void {
             $this->assertSame(Arr::get($original, $valueRemoved->getPath()), $valueRemoved->getValue());
         });
 
         // Check that the values changed are correct
-        $valuesChanged->each(function (ValueChange $valueChange) use ($changedItems, $new, $original) {
+        $valuesChanged->each(function (ValueChange $valueChange) use ($changedItems, $new, $original): void {
             $this->assertContains($valueChange->getPath(), $changedItems);
             $this->assertSame(Arr::get($original, $valueChange->getPath()), $valueChange->getOldValue());
             $this->assertSame(Arr::get($new, $valueChange->getPath()), $valueChange->getNewValue());
