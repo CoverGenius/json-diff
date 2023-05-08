@@ -19,7 +19,7 @@ class CalculateDifferenceBetweenListArraysWithMinimalChangesAction
     private $sortKeyDifferencesByNumberOfChangesAction;
 
     /**
-     * @var SelectMinimalOriginalDiffsAction
+     * @var SelectJsonDiffsForOriginalKeysWithMinimalChangesAction
      */
     private $selectMinimalOriginalDiffsAction;
 
@@ -49,14 +49,14 @@ class CalculateDifferenceBetweenListArraysWithMinimalChangesAction
     private $addRemovalsToJsonDiffAction;
 
     public function __construct(
-        CalculateAllDifferencesRespectiveToOriginalAction $calculateAllDifferencesRespectiveToOriginalAction,
-        SortDifferencesByNumberOfChangesAction            $sortKeyDifferencesByNumberOfChangesAction,
-        SelectMinimalOriginalDiffsAction                  $selectMinimalOriginalDiffsAction,
-        GetItemPathAction                                 $getItemPathAction,
-        MergeJsonDiffsAction                              $mergeDiffsAction,
-        GetJsonDiffsFromDiffMappingsAction                $getDiffsFromDiffMappingsAction,
-        AddAdditionsToJsonDiffAction                      $addAdditionsToJsonDiffAction,
-        AddRemovalsToJsonDiffAction                       $addRemovalsToJsonDiffAction
+        CalculateAllDifferencesRespectiveToOriginalAction      $calculateAllDifferencesRespectiveToOriginalAction,
+        SortDifferencesByNumberOfChangesAction                 $sortKeyDifferencesByNumberOfChangesAction,
+        SelectJsonDiffsForOriginalKeysWithMinimalChangesAction $selectMinimalOriginalDiffsAction,
+        GetItemPathAction                                      $getItemPathAction,
+        MergeJsonDiffsAction                                   $mergeDiffsAction,
+        GetJsonDiffsFromDiffMappingsAction                     $getDiffsFromDiffMappingsAction,
+        AddAdditionsToJsonDiffAction                           $addAdditionsToJsonDiffAction,
+        AddRemovalsToJsonDiffAction                            $addRemovalsToJsonDiffAction
     ) {
         $this->calculateAllDifferencesRespectiveToOriginalAction = $calculateAllDifferencesRespectiveToOriginalAction;
         $this->sortKeyDifferencesByNumberOfChangesAction = $sortKeyDifferencesByNumberOfChangesAction;

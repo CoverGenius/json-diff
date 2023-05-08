@@ -7,7 +7,7 @@ namespace Jet\JsonDiff\Actions;
 use Illuminate\Support\Collection;
 use Jet\JsonDiff\DiffMapping;
 
-class SelectMinimalOriginalDiffsAction
+class SelectJsonDiffsForOriginalKeysWithMinimalChangesAction
 {
     /**
      * @param Collection<Collection<DiffMapping>> $diffs
