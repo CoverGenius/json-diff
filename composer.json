@@ -40,6 +40,9 @@
         ],
         "lint": [
             "php-cs-fixer fix -v"
+        ],
+        "test:with-coverage": [
+            "phpunit --coverage-html ./test-reports"
         ]
     }
 }
