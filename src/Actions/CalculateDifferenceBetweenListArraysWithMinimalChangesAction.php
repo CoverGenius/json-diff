@@ -29,7 +29,7 @@ class CalculateDifferenceBetweenListArraysWithMinimalChangesAction
     private $getItemPathAction;
 
     /**
-     * @var MergeDiffsAction
+     * @var MergeJsonDiffsAction
      */
     private $mergeDiffsAction;
 
@@ -53,7 +53,7 @@ class CalculateDifferenceBetweenListArraysWithMinimalChangesAction
         SortDifferencesByNumberOfChangesAction            $sortKeyDifferencesByNumberOfChangesAction,
         SelectMinimalOriginalDiffsAction                  $selectMinimalOriginalDiffsAction,
         GetItemPathAction                                 $getItemPathAction,
-        MergeDiffsAction                                  $mergeDiffsAction,
+        MergeJsonDiffsAction                              $mergeDiffsAction,
         GetJsonDiffsFromDiffMappingsAction                $getDiffsFromDiffMappingsAction,
         AddAdditionsToJsonDiffAction                      $addAdditionsToJsonDiffAction,
         AddRemovalsToJsonDiffAction                       $addRemovalsToJsonDiffAction

@@ -7,7 +7,7 @@ namespace Jet\JsonDiff\Actions;
 use Illuminate\Support\Collection;
 use Jet\JsonDiff\JsonDiff;
 
-class MergeDiffsAction
+class MergeJsonDiffsAction
 {
     /**
      * @param Collection<JsonDiff> $jsonDiffs
