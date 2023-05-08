@@ -34,7 +34,7 @@ class CalculateDifferenceBetweenListArraysWithMinimalChangesAction
     private $mergeDiffsAction;
 
     /**
-     * @var GetDiffsFromDiffMappingsAction
+     * @var GetJsonDiffsFromDiffMappingsAction
      */
     private $getDiffsFromDiffMappingsAction;
 
@@ -50,13 +50,13 @@ class CalculateDifferenceBetweenListArraysWithMinimalChangesAction
 
     public function __construct(
         CalculateAllDifferencesRespectiveToOriginalAction $calculateAllDifferencesRespectiveToOriginalAction,
-        SortDifferencesByNumberOfChangesAction $sortKeyDifferencesByNumberOfChangesAction,
-        SelectMinimalOriginalDiffsAction $selectMinimalOriginalDiffsAction,
-        GetItemPathAction $getItemPathAction,
-        MergeDiffsAction $mergeDiffsAction,
-        GetDiffsFromDiffMappingsAction $getDiffsFromDiffMappingsAction,
-        AddAdditionsToJsonDiffAction $addAdditionsToJsonDiffAction,
-        AddRemovalsToJsonDiffAction $addRemovalsToJsonDiffAction
+        SortDifferencesByNumberOfChangesAction            $sortKeyDifferencesByNumberOfChangesAction,
+        SelectMinimalOriginalDiffsAction                  $selectMinimalOriginalDiffsAction,
+        GetItemPathAction                                 $getItemPathAction,
+        MergeDiffsAction                                  $mergeDiffsAction,
+        GetJsonDiffsFromDiffMappingsAction                $getDiffsFromDiffMappingsAction,
+        AddAdditionsToJsonDiffAction                      $addAdditionsToJsonDiffAction,
+        AddRemovalsToJsonDiffAction                       $addRemovalsToJsonDiffAction
     ) {
         $this->calculateAllDifferencesRespectiveToOriginalAction = $calculateAllDifferencesRespectiveToOriginalAction;
         $this->sortKeyDifferencesByNumberOfChangesAction = $sortKeyDifferencesByNumberOfChangesAction;
