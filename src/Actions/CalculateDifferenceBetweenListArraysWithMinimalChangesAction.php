@@ -16,12 +16,12 @@ class CalculateDifferenceBetweenListArraysWithMinimalChangesAction
     /**
      * @var SortDifferencesByNumberOfChangesAction
      */
-    private $sortKeyDifferencesByNumberOfChangesAction;
+    private $sortDifferencesByNumberOfChangesAction;
 
     /**
      * @var SelectJsonDiffsForOriginalKeysWithMinimalChangesAction
      */
-    private $selectMinimalOriginalDiffsAction;
+    private $selectJsonDiffsForOriginalKeysWithMinimalChangesAction;
 
     /**
      * @var GetItemPathAction
@@ -31,12 +31,12 @@ class CalculateDifferenceBetweenListArraysWithMinimalChangesAction
     /**
      * @var MergeJsonDiffsAction
      */
-    private $mergeDiffsAction;
+    private $mergeJsonDiffsAction;
 
     /**
      * @var GetJsonDiffsFromDiffMappingsAction
      */
-    private $getDiffsFromDiffMappingsAction;
+    private $getJsonDiffsFromDiffMappingsAction;
 
     /**
      * @var AddAdditionsToJsonDiffAction
@@ -49,21 +49,21 @@ class CalculateDifferenceBetweenListArraysWithMinimalChangesAction
     private $addRemovalsToJsonDiffAction;
 
     public function __construct(
-        CalculateAllDifferencesRespectiveToOriginalAction      $calculateAllDifferencesRespectiveToOriginalAction,
-        SortDifferencesByNumberOfChangesAction                 $sortKeyDifferencesByNumberOfChangesAction,
-        SelectJsonDiffsForOriginalKeysWithMinimalChangesAction $selectMinimalOriginalDiffsAction,
-        GetItemPathAction                                      $getItemPathAction,
-        MergeJsonDiffsAction                                   $mergeDiffsAction,
-        GetJsonDiffsFromDiffMappingsAction                     $getDiffsFromDiffMappingsAction,
-        AddAdditionsToJsonDiffAction                           $addAdditionsToJsonDiffAction,
-        AddRemovalsToJsonDiffAction                            $addRemovalsToJsonDiffAction
+        CalculateAllDifferencesRespectiveToOriginalAction $calculateAllDifferencesRespectiveToOriginalAction,
+        SortDifferencesByNumberOfChangesAction $sortDifferencesByNumberOfChangesAction,
+        SelectJsonDiffsForOriginalKeysWithMinimalChangesAction $selectJsonDiffsForOriginalKeysWithMinimalChangesAction,
+        GetItemPathAction $getItemPathAction,
+        MergeJsonDiffsAction $mergeJsonDiffsAction,
+        GetJsonDiffsFromDiffMappingsAction $getJsonDiffsFromDiffMappingsAction,
+        AddAdditionsToJsonDiffAction $addAdditionsToJsonDiffAction,
+        AddRemovalsToJsonDiffAction $addRemovalsToJsonDiffAction
     ) {
         $this->calculateAllDifferencesRespectiveToOriginalAction = $calculateAllDifferencesRespectiveToOriginalAction;
-        $this->sortKeyDifferencesByNumberOfChangesAction = $sortKeyDifferencesByNumberOfChangesAction;
-        $this->selectMinimalOriginalDiffsAction = $selectMinimalOriginalDiffsAction;
+        $this->sortDifferencesByNumberOfChangesAction = $sortDifferencesByNumberOfChangesAction;
+        $this->selectJsonDiffsForOriginalKeysWithMinimalChangesAction = $selectJsonDiffsForOriginalKeysWithMinimalChangesAction;
         $this->getItemPathAction = $getItemPathAction;
-        $this->mergeDiffsAction = $mergeDiffsAction;
-        $this->getDiffsFromDiffMappingsAction = $getDiffsFromDiffMappingsAction;
+        $this->mergeJsonDiffsAction = $mergeJsonDiffsAction;
+        $this->getJsonDiffsFromDiffMappingsAction = $getJsonDiffsFromDiffMappingsAction;
         $this->addAdditionsToJsonDiffAction = $addAdditionsToJsonDiffAction;
         $this->addRemovalsToJsonDiffAction = $addRemovalsToJsonDiffAction;
     }
@@ -79,18 +79,18 @@ class CalculateDifferenceBetweenListArraysWithMinimalChangesAction
             );
 
         $diffMappings = $this
-            ->sortKeyDifferencesByNumberOfChangesAction
+            ->sortDifferencesByNumberOfChangesAction
             ->execute($diffMappings);
 
         $diffMappings = $this
-            ->selectMinimalOriginalDiffsAction
+            ->selectJsonDiffsForOriginalKeysWithMinimalChangesAction
             ->execute($diffMappings);
 
         $jsonDiff = $this
-            ->mergeDiffsAction
+            ->mergeJsonDiffsAction
             ->execute(
                 $this
-                    ->getDiffsFromDiffMappingsAction
+                    ->getJsonDiffsFromDiffMappingsAction
                     ->execute($diffMappings)
             );
 

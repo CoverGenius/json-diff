@@ -50,7 +50,7 @@ class JsonDiff
     /**
      * @var CalculateDifferenceBetweenListArraysWithMinimalChangesAction
      */
-    private $calculateMinimalDiffOfListArrayAction;
+    private $calculateDifferenceBetweenListArraysWithMinimalChangesAction;
 
     /**
      * @param array|bool|float|int|string|null $original
@@ -68,7 +68,7 @@ class JsonDiff
 
         $this->getItemPathAction = $this->serviceContainer
             ->make(GetItemPathAction::class);
-        $this->calculateMinimalDiffOfListArrayAction = $this->serviceContainer
+        $this->calculateDifferenceBetweenListArraysWithMinimalChangesAction = $this->serviceContainer
             ->make(CalculateDifferenceBetweenListArraysWithMinimalChangesAction::class);
 
         // No differences
@@ -93,7 +93,7 @@ class JsonDiff
             $this
                 ->mergeChanges(
                     $this
-                        ->calculateMinimalDiffOfListArrayAction
+                        ->calculateDifferenceBetweenListArraysWithMinimalChangesAction
                         ->execute($original, $new, $startingPath)
                 );
         } else {
@@ -127,7 +127,7 @@ class JsonDiff
                 if (array_is_list($currentOriginal) && array_is_list($currentNew)) {
                     $this->mergeChanges(
                         $this
-                            ->calculateMinimalDiffOfListArrayAction
+                            ->calculateDifferenceBetweenListArraysWithMinimalChangesAction
                             ->execute(
                                 $currentOriginal,
                                 $currentNew,
