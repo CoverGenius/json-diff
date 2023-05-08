@@ -119,7 +119,6 @@ class JsonDiff
         $mutualKeys = array_intersect($originalKeys, $newKeys);
         // Check if value has changed
         collect($mutualKeys)->each(function ($key) use ($new, $original, $path): void {
-            /** @todo if the value is an object, decide what to do */
             $currentOriginal = $original[$key];
             $currentNew = $new[$key];
 
