@@ -191,7 +191,7 @@ class JsonDiffTest extends TestCase
 
         // Check that the correct keys are removed
         $keysRemoved->each(function (KeyRemoved $keyRemoved) use ($removedItems): void {
-            $this->assertArrayHasKey($keyRemoved->getKey(), $removedItems);
+            $this->assertArrayHasKey($keyRemoved->getName(), $removedItems);
         });
 
         // Check that the correct values are removed
