@@ -64,8 +64,8 @@ class JsonDiffTest extends TestCase
         ];
 
         $addedItems = [
-            'gender' => 'male',
-            'nationality' => 'Singapore',
+            'gender',
+            'nationality',
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
@@ -78,12 +78,12 @@ class JsonDiffTest extends TestCase
 
         // Check that the new keys are added
         $keysAdded->each(function (KeyAdded $keyAdded) use ($addedItems): void {
-            $this->assertArrayHasKey($keyAdded->getKey(), $addedItems);
+            $this->assertContains($keyAdded->getPath(), $addedItems);
         });
 
         // Check that new values are added
-        $valuesAdded->each(function (ValueAdded $valueAdded) use ($addedItems): void {
-            $this->assertSame($addedItems[$valueAdded->getPath()], $valueAdded->getValue());
+        $valuesAdded->each(function (ValueAdded $valueAdded) use ($new): void {
+            $this->assertSame(Arr::get($new, $valueAdded->getPath()), $valueAdded->getValue());
         });
 
         $this->assertEmpty($jsonDiff->getKeysRemoved());
@@ -124,18 +124,8 @@ class JsonDiffTest extends TestCase
         ];
 
         $addedItems = [
-            0 => [
-                'name' => 'James',
-                'age' => 31,
-                'birth_date' => '16/06/1972',
-                'nationality' => 'Korea',
-            ],
-            2 => [
-                'name' => 'Joanne',
-                'age' => 25,
-                'birth_date' => '16/06/1982',
-                'nationality' => 'Sweden',
-            ],
+            '0',
+            '2',
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
@@ -148,12 +138,12 @@ class JsonDiffTest extends TestCase
 
         // Check that the new keys are added
         $keysAdded->each(function (KeyAdded $keyAdded) use ($addedItems): void {
-            $this->assertArrayHasKey($keyAdded->getKey(), $addedItems);
+            $this->assertContains($keyAdded->getPath(), $addedItems);
         });
 
         // Check that new values are added
-        $valuesAdded->each(function (ValueAdded $valueAdded) use ($addedItems): void {
-            $this->assertSame($addedItems[$valueAdded->getPath()], $valueAdded->getValue());
+        $valuesAdded->each(function (ValueAdded $valueAdded) use ($new): void {
+            $this->assertSame(Arr::get($new, $valueAdded->getPath()), $valueAdded->getValue());
         });
 
         $this->assertEmpty($jsonDiff->getKeysRemoved());
@@ -180,8 +170,8 @@ class JsonDiffTest extends TestCase
         ];
 
         $removedItems = [
-            'flight_date' => '12/12/2024',
-            'flight_time' => '7h30m',
+            'flight_date',
+            'flight_time',
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
@@ -191,12 +181,12 @@ class JsonDiffTest extends TestCase
 
         // Check that the correct keys are removed
         $keysRemoved->each(function (KeyRemoved $keyRemoved) use ($removedItems): void {
-            $this->assertArrayHasKey($keyRemoved->getName(), $removedItems);
+            $this->assertContains($keyRemoved->getPath(), $removedItems);
         });
 
         // Check that the correct values are removed
-        $valuesRemoved->each(function (ValueRemoved $valueRemoved) use ($removedItems): void {
-            $this->assertSame($removedItems[$valueRemoved->getPath()], $valueRemoved->getValue());
+        $valuesRemoved->each(function (ValueRemoved $valueRemoved) use ($original): void {
+            $this->assertSame(Arr::get($original, $valueRemoved->getPath()), $valueRemoved->getValue());
         });
 
         $this->assertEmpty($jsonDiff->getKeysAdded());
@@ -245,34 +235,26 @@ class JsonDiffTest extends TestCase
         ];
 
         $removedItems = [
-            [
-                'flight_reference' => 'AP10622',
-                'booking_reference' => '345-AST-INS',
-                'airline' => 'Alpaca Airline',
-                'flight_date' => '12/12/2024',
-                'destination' => 'Fiji',
-                'flight_time' => '5h30m',
-            ],
-            [
-                'flight_reference' => 'JT12222',
-                'booking_reference' => '222-JTS-INS',
-                'airline' => 'Jet Airline',
-                'flight_date' => '12/12/2024',
-                'destination' => 'France',
-                'flight_time' => '10h45m',
-            ],
+            '0',
+            '2',
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
 
+        $keysRemoved = $jsonDiff->getKeysRemoved();
         $valuesRemoved = $jsonDiff->getValuesRemoved();
 
         // Check that the correct number keys are removed
         $this->assertSame(2, $jsonDiff->getKeysRemoved()->count());
 
+        // Check that the correct keys are removed
+        $keysRemoved->each(function (KeyRemoved $keyRemoved) use ($removedItems): void {
+            $this->assertContains($keyRemoved->getPath(), $removedItems);
+        });
+
         // Check that the correct values are removed
-        $valuesRemoved->each(function (ValueRemoved $valueRemoved) use ($removedItems): void {
-            $this->assertContains($valueRemoved->getValue(), $removedItems);
+        $valuesRemoved->each(function (ValueRemoved $valueRemoved) use ($original): void {
+            $this->assertSame(Arr::get($original, $valueRemoved->getPath()), $valueRemoved->getValue());
         });
 
         $this->assertEmpty($jsonDiff->getKeysAdded());
@@ -330,7 +312,7 @@ class JsonDiffTest extends TestCase
             ],
         ];
 
-        $modifiedItemsKey = [
+        $modifiedItems = [
             'company',
             'points',
             'segment.0.destination',
@@ -341,8 +323,9 @@ class JsonDiffTest extends TestCase
 
         $valuesChanged = $jsonDiff->getValuesChanged();
 
-        $valuesChanged->each(function (ValueChange $valueChange) use ($new, $modifiedItemsKey): void {
-            $this->assertContains($valueChange->getPath(), $modifiedItemsKey);
+        $valuesChanged->each(function (ValueChange $valueChange) use ($original, $new, $modifiedItems): void {
+            $this->assertContains($valueChange->getPath(), $modifiedItems);
+            $this->assertSame(Arr::get($original, $valueChange->getPath()), $valueChange->getOldValue());
             $this->assertSame(Arr::get($new, $valueChange->getPath()), $valueChange->getNewValue());
         });
 
@@ -412,7 +395,7 @@ class JsonDiffTest extends TestCase
             ],
         ];
 
-        $addedKeys = [
+        $addedItems = [
             'segment.0.booking_reference',
             'segment.0.boarding_information',
             'segment.1.booking_reference',
@@ -424,8 +407,8 @@ class JsonDiffTest extends TestCase
         $valuesAdded = $jsonDiff->getValuesAdded();
         $keysAdded = $jsonDiff->getKeysAdded();
 
-        $keysAdded->each(function (KeyAdded $keyAdded) use ($addedKeys): void {
-            $this->assertContains($keyAdded->getPath(), $addedKeys);
+        $keysAdded->each(function (KeyAdded $keyAdded) use ($addedItems): void {
+            $this->assertContains($keyAdded->getPath(), $addedItems);
         });
 
         $valuesAdded->each(function (ValueAdded $valueAdded) use ($new): void {
@@ -514,13 +497,202 @@ class JsonDiffTest extends TestCase
             ],
         ];
 
-        $removedItemsKey = [
-            0,
-            '',
+        $removedItems = [
+            '0',
+            '1.segment.0.boarding_information',
         ];
 
         $jsonDiff = new JsonDiff($original, $new);
-//        dd($jsonDiff->getKeysRemoved());
+
+        $keysRemoved = $jsonDiff->getKeysRemoved();
+        $valuesRemoved = $jsonDiff->getValuesRemoved();
+
+        // Check that the correct keys are removed
+        $keysRemoved->each(function (KeyRemoved $keyRemoved) use ($removedItems): void {
+            $this->assertContains($keyRemoved->getPath(), $removedItems);
+        });
+
+        // Check that correct values are removed
+        $valuesRemoved->each(function (ValueRemoved $valueRemoved) use ($original): void {
+            $this->assertSame(Arr::get($original, $valueRemoved->getPath()), $valueRemoved->getValue());
+        });
+
+        $this->assertEmpty($jsonDiff->getKeysAdded());
+        $this->assertEmpty($jsonDiff->getValuesChanged());
+        $this->assertEmpty($jsonDiff->getValuesAdded());
+    }
+
+    public function test_complex_operations_between_two_jsons(): void
+    {
+        $original = [
+            [
+                'id' => '3fe21e46fd78',
+                'company' => 'Alpha Airline',
+                'points' => 20000,
+                'duration' => 862,
+                'segment' => [
+                    0 => [
+                        'booking_reference' => 'AH15243',
+                        'boarding_information' => [
+                            'terminal' => 2,
+                            'gate' => '15',
+                        ],
+                        'duration' => 635,
+                        'departureTime' => '2023-05-04 00:53:35',
+                        'arrivalTime' => '2023-05-04 11:28:53',
+                        'origin' => 'Sydney',
+                        'destination' => 'Taiwan',
+                    ],
+                    1 => [
+                        'booking_reference' => 'AH35728',
+                        'boarding_information' => [
+                            'terminal' => 1,
+                            'gate' => '1',
+                        ],
+                        'duration' => 180,
+                        'departureTime' => '2023-05-04 13:33:53',
+                        'arrivalTime' => '2023-05-04 16:33:53',
+                        'origin' => 'Taiwan',
+                        'destination' => 'Korea',
+                    ],
+                ],
+            ],
+            [
+                'id' => '4fe21e477f78',
+                'company' => 'Beta Airline',
+                'points' => 10000,
+                'duration' => 300,
+                'segment' => [
+                    0 => [
+                        'booking_reference' => 'BH61121',
+                        'boarding_information' => [
+                            'terminal' => 3,
+                            'gate' => '7',
+                        ],
+                        'duration' => 300,
+                        'departureTime' => '2023-05-04 00:53:35',
+                        'arrivalTime' => '2023-05-04 05:53:35',
+                        'origin' => 'Singapore',
+                        'destination' => 'Thailand',
+                    ],
+                ],
+            ],
+        ];
+
+        $new = [
+            [
+                'id' => '66t21d46fd78',
+                'company' => 'Alpha Airline',
+                'points' => 20000,
+                'duration' => 300,
+                'segment' => [
+                    0 => [
+                        'booking_reference' => 'AH11143',
+                        'boarding_information' => [
+                            'terminal' => 5,
+                            'gate' => '7',
+                        ],
+                        'duration' => 300,
+                        'departureTime' => '2023-07-04 11:00:00',
+                        'arrivalTime' => '2023-07-04 14:00:00',
+                        'origin' => 'Sydney',
+                        'destination' => 'Jakarta',
+                    ],
+                ],
+            ],
+            [
+                'id' => '5de21e211f78',
+                'company' => 'Jet Airline',
+                'points' => 15000,
+                'duration' => 480,
+                'segment' => [
+                    0 => [
+                        'booking_reference' => 'JA21121',
+                        'boarding_information' => [
+                            'terminal' => 1,
+                            'gate' => '1',
+                        ],
+                        'duration' => 480,
+                        'departureTime' => '2023-07-04 08:00:00',
+                        'arrivalTime' => '2023-07-04 16:00:00',
+                        'origin' => 'Sydney',
+                        'destination' => 'Kuala Lumpur',
+                    ],
+                ],
+            ],
+            [
+                'id' => '4fe21e477f78',
+                'company' => 'Beta Airline',
+                'points' => 10000,
+                'duration' => 300,
+                'segment' => [
+                    0 => [
+                        'duration' => 300,
+                        'departureTime' => '2023-05-04 00:53:35',
+                        'arrivalTime' => '2023-05-04 05:53:35',
+                        'origin' => 'Singapore',
+                        'destination' => 'Thailand',
+                    ],
+                ],
+            ],
+        ];
+
+        $addedItems = [
+            '1',
+        ];
+
+        $changedItems = [
+            '0.id',
+            '0.duration',
+            '0.segment.0.booking_reference',
+            '0.segment.0.boarding_information.terminal',
+            '0.segment.0.boarding_information.gate',
+            '0.segment.0.duration',
+            '0.segment.0.departureTime',
+            '0.segment.0.arrivalTime',
+            '0.segment.0.destination',
+        ];
+
+        $removedItems = [
+            '0.segment.1',
+            '1.segment.0.booking_reference',
+            '1.segment.0.boarding_information',
+        ];
+
+        $jsonDiff = new JsonDiff($original, $new);
+
+        $keysAdded = $jsonDiff->getKeysAdded();
+        $valuesAdded = $jsonDiff->getValuesAdded();
+
+        $keysRemoved = $jsonDiff->getKeysRemoved();
+        $valuesRemoved = $jsonDiff->getValuesRemoved();
+
+        $valuesChanged = $jsonDiff->getValuesChanged();
+
+        // Check that the correct keys and values are added
+        $keysAdded->each(function (KeyAdded $keyAdded) use ($addedItems): void {
+            $this->assertContains($keyAdded->getPath(), $addedItems);
+        });
+
+        $valuesAdded->each(function (ValueAdded $valueAdded) use ($new): void {
+            $this->assertSame(Arr::get($new, $valueAdded->getPath()), $valueAdded->getValue());
+        });
+
+        // Check that the correct keys and values are removed
+        $keysRemoved->each(function (KeyRemoved $keyRemoved) use ($removedItems): void {
+            $this->assertContains($keyRemoved->getPath(), $removedItems);
+        });
+
+        $valuesRemoved->each(function (ValueRemoved $valueRemoved) use ($original): void {
+            $this->assertSame(Arr::get($original, $valueRemoved->getPath()), $valueRemoved->getValue());
+        });
+
+        // Check that the values changed are correct
+        $valuesChanged->each(function (ValueChange $valueChange) use ($changedItems, $new, $original): void {
+            $this->assertContains($valueChange->getPath(), $changedItems);
+            $this->assertSame(Arr::get($original, $valueChange->getPath()), $valueChange->getOldValue());
+            $this->assertSame(Arr::get($new, $valueChange->getPath()), $valueChange->getNewValue());
+        });
     }
 
     public function test_json_diff_with_scalar_types(): void
