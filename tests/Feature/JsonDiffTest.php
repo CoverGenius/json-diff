@@ -611,6 +611,38 @@ class JsonDiffTest extends TestCase
         }
     }
 
+    public function test_recursiveness_with_nested_arrays(): void
+    {
+        $original = [
+            'name' => 'John',
+            'company' => [
+                'name' => 'Company X',
+            ],
+        ];
+
+        $new = [
+            'name' => 'John',
+            'company' => [
+                'name' => 'Company Y',
+            ],
+        ];
+
+        $jsonDiff = new JsonDiff($original, $new);
+
+        $this->assertSame(1, $jsonDiff->getNumberOfChanges());
+        $this->assertCount(1, $jsonDiff->getValuesChanged());
+        /** @var ValueChange $valueChange */
+        $valueChange = $jsonDiff->getValuesChanged()->first();
+        $this->assertSame(
+            'Company X',
+            $valueChange->getOldValue()
+        );
+        $this->assertSame(
+            'Company Y',
+            $valueChange->getNewValue()
+        );
+    }
+
     public function test_basic_array_list(): void
     {
         $originalArray = [0, 1, 2];
