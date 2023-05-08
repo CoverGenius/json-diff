@@ -6,7 +6,7 @@ namespace Jet\JsonDiff;
 
 use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
-use Jet\JsonDiff\Actions\CalculateMinimalDiffOfListArrayAction;
+use Jet\JsonDiff\Actions\CalculateDifferenceBetweenListArraysWithMinimalChangesAction;
 use Jet\JsonDiff\Actions\GetItemPathAction;
 use function is_array;
 
@@ -48,7 +48,7 @@ class JsonDiff
     private $getItemPathAction;
 
     /**
-     * @var CalculateMinimalDiffOfListArrayAction
+     * @var CalculateDifferenceBetweenListArraysWithMinimalChangesAction
      */
     private $calculateMinimalDiffOfListArrayAction;
 
@@ -69,7 +69,7 @@ class JsonDiff
         $this->getItemPathAction = $this->serviceContainer
             ->make(GetItemPathAction::class);
         $this->calculateMinimalDiffOfListArrayAction = $this->serviceContainer
-            ->make(CalculateMinimalDiffOfListArrayAction::class);
+            ->make(CalculateDifferenceBetweenListArraysWithMinimalChangesAction::class);
 
         // No differences
         if ($original === $new) {

@@ -6,7 +6,7 @@ namespace Jet\JsonDiff\Actions;
 
 use Jet\JsonDiff\JsonDiff;
 
-class CalculateMinimalDiffOfListArrayAction
+class CalculateDifferenceBetweenListArraysWithMinimalChangesAction
 {
     /**
      * @var CalculateAllDifferencesRespectiveToOriginalAction
@@ -50,13 +50,13 @@ class CalculateMinimalDiffOfListArrayAction
 
     public function __construct(
         CalculateAllDifferencesRespectiveToOriginalAction $calculateAllDifferencesRespectiveToOriginalAction,
-        SortDifferencesByNumberOfChangesAction            $sortKeyDifferencesByNumberOfChangesAction,
-        SelectMinimalOriginalDiffsAction                  $selectMinimalOriginalDiffsAction,
-        GetItemPathAction                                 $getItemPathAction,
-        MergeDiffsAction                                  $mergeDiffsAction,
-        GetDiffsFromDiffMappingsAction                    $getDiffsFromDiffMappingsAction,
-        AddAdditionsToJsonDiffAction                      $addAdditionsToJsonDiffAction,
-        AddRemovalsToJsonDiffAction                       $addRemovalsToJsonDiffAction
+        SortDifferencesByNumberOfChangesAction $sortKeyDifferencesByNumberOfChangesAction,
+        SelectMinimalOriginalDiffsAction $selectMinimalOriginalDiffsAction,
+        GetItemPathAction $getItemPathAction,
+        MergeDiffsAction $mergeDiffsAction,
+        GetDiffsFromDiffMappingsAction $getDiffsFromDiffMappingsAction,
+        AddAdditionsToJsonDiffAction $addAdditionsToJsonDiffAction,
+        AddRemovalsToJsonDiffAction $addRemovalsToJsonDiffAction
     ) {
         $this->calculateAllDifferencesRespectiveToOriginalAction = $calculateAllDifferencesRespectiveToOriginalAction;
         $this->sortKeyDifferencesByNumberOfChangesAction = $sortKeyDifferencesByNumberOfChangesAction;
