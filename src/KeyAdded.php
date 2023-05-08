@@ -27,7 +27,7 @@ class KeyAdded
         return $this->path;
     }
 
-    public function getKey()
+    public function getName()
     {
         return $this->name;
     }
