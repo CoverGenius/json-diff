@@ -6,7 +6,7 @@ namespace Jet\JsonDiff;
 
 use Illuminate\Container\Container;
 use Illuminate\Support\Collection;
-use Jet\JsonDiff\Actions\CalculateMinimalDiffOfListArrayAction;
+use Jet\JsonDiff\Actions\CalculateDifferenceBetweenListArraysWithMinimalChangesAction;
 use Jet\JsonDiff\Actions\GetItemPathAction;
 use function is_array;
 
@@ -48,9 +48,9 @@ class JsonDiff
     private $getItemPathAction;
 
     /**
-     * @var CalculateMinimalDiffOfListArrayAction
+     * @var CalculateDifferenceBetweenListArraysWithMinimalChangesAction
      */
-    private $calculateMinimalDiffOfListArrayAction;
+    private $calculateDifferenceBetweenListArraysWithMinimalChangesAction;
 
     /**
      * @param array|bool|float|int|string|null $original
@@ -68,8 +68,8 @@ class JsonDiff
 
         $this->getItemPathAction = $this->serviceContainer
             ->make(GetItemPathAction::class);
-        $this->calculateMinimalDiffOfListArrayAction = $this->serviceContainer
-            ->make(CalculateMinimalDiffOfListArrayAction::class);
+        $this->calculateDifferenceBetweenListArraysWithMinimalChangesAction = $this->serviceContainer
+            ->make(CalculateDifferenceBetweenListArraysWithMinimalChangesAction::class);
 
         // No differences
         if ($original === $new) {
@@ -93,7 +93,7 @@ class JsonDiff
             $this
                 ->mergeChanges(
                     $this
-                        ->calculateMinimalDiffOfListArrayAction
+                        ->calculateDifferenceBetweenListArraysWithMinimalChangesAction
                         ->execute($original, $new, $startingPath)
                 );
         } else {
@@ -119,7 +119,6 @@ class JsonDiff
         $mutualKeys = array_intersect($originalKeys, $newKeys);
         // Check if value has changed
         collect($mutualKeys)->each(function ($key) use ($new, $original, $path): void {
-            /** @todo if the value is an object, decide what to do */
             $currentOriginal = $original[$key];
             $currentNew = $new[$key];
 
@@ -127,7 +126,7 @@ class JsonDiff
                 if (array_is_list($currentOriginal) && array_is_list($currentNew)) {
                     $this->mergeChanges(
                         $this
-                            ->calculateMinimalDiffOfListArrayAction
+                            ->calculateDifferenceBetweenListArraysWithMinimalChangesAction
                             ->execute(
                                 $currentOriginal,
                                 $currentNew,

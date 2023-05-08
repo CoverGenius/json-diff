@@ -6,11 +6,13 @@ namespace Jet\JsonDiff\Actions;
 
 use Illuminate\Support\Collection;
 use Jet\JsonDiff\DiffMapping;
+use Jet\JsonDiff\JsonDiff;
 
-class GetDiffsFromDiffMappingsAction
+class GetJsonDiffsFromDiffMappingsAction
 {
     /**
      * @param Collection<DiffMapping> $diffMappings
+     * @return Collection<JsonDiff>
      */
     public function execute(Collection $diffMappings): Collection
     {

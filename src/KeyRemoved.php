@@ -26,7 +26,7 @@ class KeyRemoved
         return $this->path;
     }
 
-    public function getKey()
+    public function getName()
     {
         return $this->name;
     }

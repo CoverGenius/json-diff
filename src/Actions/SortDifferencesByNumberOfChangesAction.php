@@ -7,7 +7,7 @@ namespace Jet\JsonDiff\Actions;
 use Illuminate\Support\Collection;
 use Jet\JsonDiff\DiffMapping;
 
-class SortKeyDifferencesByNumberOfChangesAction
+class SortDifferencesByNumberOfChangesAction
 {
     public function execute(Collection $diffMappings): Collection
     {
@@ -21,8 +21,6 @@ class SortKeyDifferencesByNumberOfChangesAction
                         if ($sortResult === 0) {
                             $sortResult = $diffMappingA->getDiff()->getValuesChanged()->count() - $diffMappingB->getDiff()->getValuesChanged()->count();
                         }
-
-                        // @todo think about scenarios where keys are removed.
 
                         return $sortResult;
                     })
