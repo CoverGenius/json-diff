@@ -19,11 +19,14 @@ class SelectJsonDiffsForOriginalKeysWithMinimalChangesAction
         $originalToNewIndexMapping = collect();
 
         do {
-            $addedMapping = false;
+            $modifiedMapping = false;
 
-            $diffs->each(function (Collection $diffMappings) use (&$originalToNewIndexMapping, &$keysProcessedInNewArray, &$addedMapping): void {
-                $diffMappings->each(function (DiffMapping $diffMapping) use (&$originalToNewIndexMapping, &$keysProcessedInNewArray, &$addedMapping): void {
-                    // If we find a diff mapping with lesser changes than an existing mapping, replace it
+            $diffs->each(function (Collection $diffMappings) use (&$originalToNewIndexMapping, &$keysProcessedInNewArray, &$modifiedMapping): void {
+                $diffMappings->each(function (DiffMapping $diffMapping) use (&$originalToNewIndexMapping, &$keysProcessedInNewArray, &$modifiedMapping): void {
+                    /*
+                     * If this diff mapping's new index has already been mapped, and it has fewer changes
+                     * skip this diff mapping.
+                     */
                     if (
                         $keysProcessedInNewArray->has($diffMapping->getNewIndex())
                         && $diffMapping
@@ -37,8 +40,10 @@ class SelectJsonDiffsForOriginalKeysWithMinimalChangesAction
                         return;
                     }
 
-                    // If we have an existing diff mapping to the original index with lesser changes than the current
-                    // diff mapping, skip replacing the mapping with the current index
+                    /*
+                     * If this diff mapping's original index has already been mapped, and it has fewer changes
+                     * skip this diff mapping.
+                     */
                     if (
                         $originalToNewIndexMapping->has($diffMapping->getOriginalIndex())
                         && $diffMapping
@@ -52,6 +57,9 @@ class SelectJsonDiffsForOriginalKeysWithMinimalChangesAction
                         return;
                     }
 
+                    // Changes will happen so we need to keep looping
+                    $modifiedMapping = true;
+
                     // Add the mapping
                     $keysProcessedInNewArray
                         ->offsetSet(
@@ -59,18 +67,28 @@ class SelectJsonDiffsForOriginalKeysWithMinimalChangesAction
                             $diffMapping
                         );
 
-                    // Add an original index to new index mapping to track if an original index has been mapped to a new
-                    // index already
+                    /*
+                     * Add an original index to new index mapping to track if an original index has been mapped to a new
+                     * index already
+                     */
                     $originalToNewIndexMapping
                         ->offsetSet(
                             $diffMapping->getOriginalIndex(),
                             $diffMapping->getNewIndex()
                         );
 
-                    $addedMapping = true;
+                    // Unmap any other original indexes that may have been mapped to this diff mapping's new index
+                    $originalToNewIndexMapping
+                        ->filter(function ($newIndex, $originalIndex) use ($diffMapping) {
+                            return $originalIndex !== $diffMapping->getOriginalIndex() && $newIndex === $diffMapping->getNewIndex();
+                        })
+                        ->keys()
+                        ->each(function ($originalIndex) use (&$originalToNewIndexMapping): void {
+                            $originalToNewIndexMapping->offsetUnset($originalIndex);
+                        });
                 });
             });
-        } while ($addedMapping);
+        } while ($modifiedMapping);
 
         // For each original index, return the found diff mapping
         return $keysProcessedInNewArray->mapWithKeys(function (DiffMapping $diffMapping) {
