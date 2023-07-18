@@ -1,5 +1,5 @@
 {
-    "name": "jet/json-diff",
+    "name": "covergenius/json-diff",
     "type": "library",
     "license": "GNUv3",
     "autoload": {
