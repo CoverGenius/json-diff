@@ -20,11 +20,11 @@ jobs:
       matrix:
         php-versions: ['8.1', '8.2', '8.3']
         laravel-versions: ['9.*', '10.*', '11.*', '12.*']
-      exclude:
-        - php-versions: '8.1'
-          laravel-versions: '11.*' # Laravel 11 typically requires PHP 8.2+
-        - php-versions: '8.1'
-          laravel-versions: '12.*' # Laravel 12 typically requires PHP 8.2+
+        exclude:
+          - php-versions: '8.1'
+            laravel-versions: '11.*' # Laravel 11 typically requires PHP 8.2+
+          - php-versions: '8.1'
+            laravel-versions: '12.*' # Laravel 12 typically requires PHP 8.2+
 
     steps:
       - name: Checkout code
