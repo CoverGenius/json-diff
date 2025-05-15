@@ -46,5 +46,8 @@ jobs:
           composer update "laravel/support:${{ matrix.laravel-versions }}" --with-all-dependencies --prefer-dist --no-progress --no-interaction --no-suggest
           composer install --prefer-dist --no-progress --no-interaction --no-suggest --ignore-platform-reqs
 
+      - name: Print lock (tmp)
+        run: cat composer.lock
+
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
