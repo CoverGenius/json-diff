@@ -11,12 +11,15 @@ on:
 
 jobs:
   phpunit:
-    name: PHPUnit (PHP ${{ matrix.php-versions }})
+    name: PHPUnit (PHP ${{ matrix.php-versions }}, Laravel ${{ matrix.laravel-versions }})
+
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         php-versions: ['8.1', '8.2', '8.3']
+        laravel-versions: ['9.*', '10.*', '11.*', '12.*']
 
     steps:
       - name: Checkout code
@@ -31,12 +34,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-php-${{ matrix.php-versions }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-php-${{ matrix.php-versions }}-laravel-${{ matrix.laravel-versions }}
           restore-keys: |
-            ${{ runner.os }}-php-${{ matrix.php-versions }}-composer-
+            ${{ runner.os }}-php-${{ matrix.php-versions }}-laravel-${{ matrix.laravel-versions }}
+            ${{ runner.os }}-php-${{ matrix.php-versions }}-laravel-
+            ${{ runner.os }}-php-${{ matrix.php-versions }}-
 
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction --no-suggest
+        run: |
+          composer install --prefer-dist --no-progress --no-interaction --no-suggest
+          composer update "laravel/support:${{ matrix.laravel-versions }}" --with-all-dependencies --prefer-dist --no-progress --no-interaction --no-suggest
+          composer install --prefer-dist --no-progress --no-interaction --no-suggest --ignore-platform-reqs
 
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
