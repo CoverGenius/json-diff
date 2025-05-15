@@ -20,7 +20,10 @@
     },
     "authors": [
         {
-            "name": "Jet Lim and Ruben Funai"
+            "name": "Jet Lim"
+        },
+        {
+            "name": "Ruben Funai"
         }
     ],
     "require": {
@@ -43,6 +46,9 @@
         ],
         "test:with-coverage": [
             "phpunit --coverage-html ./test-reports"
+        ],
+        "test": [
+            "phpunit"
         ]
     }
 }
