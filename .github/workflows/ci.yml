@@ -1,12 +1,13 @@
 name: Continual Integration
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+      - feature/**
+      - bugfix/**
+      - dependabot/**
 
 jobs:
   phpunit:
