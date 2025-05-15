@@ -1,7 +1,8 @@
 {
     "name": "covergenius/json-diff",
+    "description": "JSON Diff",
     "type": "library",
-    "license": "GNUv3",
+    "license": "GPL-3.0-only",
     "autoload": {
         "psr-4": {
             "Jet\\JsonDiff\\": "src/"
