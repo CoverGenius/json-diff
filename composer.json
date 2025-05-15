@@ -45,7 +45,7 @@
         "lint": [
             "php-cs-fixer fix -v"
         ],
-        "test:with-coverage": [
+        "test:coverage": [
             "phpunit --coverage-html ./test-reports"
         ],
         "test": [
