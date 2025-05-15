@@ -20,6 +20,11 @@ jobs:
       matrix:
         php-versions: ['8.1', '8.2', '8.3']
         laravel-versions: ['9.*', '10.*', '11.*', '12.*']
+      exclude:
+        - php-versions: '8.1'
+          laravel-versions: '11.*' # Laravel 11 typically requires PHP 8.2+
+        - php-versions: '8.1'
+          laravel-versions: '12.*' # Laravel 12 typically requires PHP 8.2+
 
     steps:
       - name: Checkout code
@@ -47,9 +52,6 @@ jobs:
         run: |
           composer install --prefer-dist --no-progress --no-interaction
           composer update "illuminate/support:${{ matrix.laravel-versions }}" "illuminate/container:${{ matrix.laravel-versions }}" --with-all-dependencies --prefer-dist --no-progress --no-interaction
-
-      - name: Print lock (tmp)
-        run: cat composer.lock
 
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
