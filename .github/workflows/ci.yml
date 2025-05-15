@@ -30,6 +30,9 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
 
+      - name: Validate composer files
+        run: composer validate --strict
+
       - name: Cache Composer dependencies
         uses: actions/cache@v4
         with:
@@ -42,9 +45,7 @@ jobs:
 
       - name: Install Composer dependencies
         run: |
-          composer install --prefer-dist --no-progress --no-interaction --no-suggest
-          composer update "laravel/support:${{ matrix.laravel-versions }}" --with-all-dependencies --prefer-dist --no-progress --no-interaction --no-suggest
-          composer install --prefer-dist --no-progress --no-interaction --no-suggest --ignore-platform-reqs
+          composer update "illuminate/support:${{ matrix.laravel-versions }}" "illuminate/container:${{ matrix.laravel-versions }}" --with-all-dependencies --prefer-dist --no-progress --no-interaction
 
       - name: Print lock (tmp)
         run: cat composer.lock
