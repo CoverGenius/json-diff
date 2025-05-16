@@ -1,0 +1,57 @@
+name: Continual Integration
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feature/**
+      - bugfix/**
+      - dependabot/**
+
+jobs:
+  phpunit:
+    name: PHPUnit (PHP ${{ matrix.php-versions }}, Laravel ${{ matrix.laravel-versions }})
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-versions: ['8.1', '8.2', '8.3']
+        laravel-versions: ['9.*', '10.*', '11.*', '12.*']
+        exclude:
+          - php-versions: '8.1'
+            laravel-versions: '11.*' # Laravel 11 typically requires PHP 8.2+
+          - php-versions: '8.1'
+            laravel-versions: '12.*' # Laravel 12 typically requires PHP 8.2+
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+
+      - name: Validate composer files
+        run: composer validate --strict
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ matrix.php-versions }}-laravel-${{ matrix.laravel-versions }}
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php-versions }}-laravel-${{ matrix.laravel-versions }}
+            ${{ runner.os }}-php-${{ matrix.php-versions }}-laravel-
+            ${{ runner.os }}-php-${{ matrix.php-versions }}-
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --prefer-dist --no-progress --no-interaction
+          composer update "illuminate/support:${{ matrix.laravel-versions }}" "illuminate/container:${{ matrix.laravel-versions }}" --with-all-dependencies --prefer-dist --no-progress --no-interaction
+
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit
